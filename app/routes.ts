@@ -4,6 +4,7 @@ export default [
   index('routes/home.tsx'),
   route('/collection/:id', 'routes/collection.$id.tsx'),
   route('/wheretobuy', 'routes/buy.tsx'),
+   route('/wheretobuy/form', 'routes/buy.form.tsx'),
   route('/sample', 'routes/sample.tsx'),
   route('/sign-in', 'routes/sign-in.tsx'),
   route('/sign-up', 'routes/sign-up.tsx'),

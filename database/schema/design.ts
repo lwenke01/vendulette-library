@@ -14,10 +14,9 @@ export const designs = sqliteTable('Designs', {
   description: text('description'),
   imageUrls: text('image_urls'),
   price: real('price'),
-  releaseYear: integer('release_year'),
-  categories: text('categories'),
-  shape_name_overwrite: text('shape_name_overwrite'),
-  shape_measurements_overwrite: text('shape_measurements_overwrite'),
+  shape_name: text('shape_name'),
+  shape_measurements: text('shape_measurements'),
+
 
 })
 

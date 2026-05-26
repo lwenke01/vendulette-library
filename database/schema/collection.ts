@@ -17,6 +17,7 @@ export const collections = sqliteTable('Collections', {
   image_urls: text('image_urls'),
   releaseDate: text('releaseDate'),
   exclusive: text('exclusive'),
+  isComplete: text('isComplete'),
 })
 
 export type Collection = InferSelectModel<typeof collections>
