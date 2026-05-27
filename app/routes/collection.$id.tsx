@@ -166,7 +166,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
     name: '',
     description: '',
     price: '',
-    shape: '',
+    shape_id: '',
     shapename: '',
     measurements: '',
     collectionId: initialCollection?.id || '',
@@ -190,7 +190,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
     return Array.from(
       new Set(
         normalizedCollection.designs
-          .map((d: any) => String(d.shapename || d.shape || d.shape_name || '').trim())
+          .map((d: any) => String(d.shapename || d.shape_id || d.shape_name || '').trim())
           .filter(Boolean),
       ),
     ).sort()
@@ -506,7 +506,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                       name: '',
                       description: '',
                       price: '',
-                      shape: '',
+                      shape_id: '',
                       shapename: '',
                       measurements: '',
                       collectionId: normalizedCollection.id,
@@ -559,7 +559,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                                   <div>
                                     <h3 className="h5 mb-1">{design.name}</h3>
                                     <div className="text-muted small">
-                                      {design.shapename || design.shape_name || design.shape || 'No shape'}
+                                      {design.shapename || design.shape_name || design.shape_id|| 'No shape'}
                                     </div>
                                   </div>
 
@@ -578,7 +578,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                                           name: design.name || '',
                                           description: design.description || '',
                                           price: design.price != null ? String(design.price) : '',
-                                          shape: design.shape || '',
+                                          shape_id: design.shape_id|| '',
                                           shapename: design.shapename || design.shape_name || '',
                                           measurements: design.measurements || '',
                                           collectionId: normalizedCollection.id,
@@ -713,7 +713,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                       name: '',
                       description: '',
                       price: '',
-                      shape: '',
+                      shape_id: '',
                       shapename: '',
                       measurements: '',
                       collectionId: normalizedCollection.id,
@@ -956,11 +956,11 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
 
                         <div className="row g-3 mb-3">
                           <div className="col">
-                            <label className="form-label">Shape</label>
+                            <label className="form-label">Shape Id</label>
                             <input
                               className="form-control"
-                              value={designForm.shape ?? ''}
-                              onChange={(e) => setDesignForm((prev) => ({ ...prev, shape: e.target.value }))}
+                              value={designForm.shape_id ?? ''}
+                              onChange={(e) => setDesignForm((prev) => ({ ...prev, shape_id: e.target.value }))}
                             />
                           </div>
 
@@ -1054,7 +1054,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                                   name: d.name || '',
                                   description: d.description || '',
                                   price: d.price != null ? String(d.price) : '',
-                                  shape: d.shape || '',
+                                  shape_id: d.shape_id || '',
                                   shapename: d.shapename || d.shape_name || '',
                                   measurements: d.measurements || '',
                                   collectionId: normalizedCollection.id,
