@@ -103,7 +103,7 @@ interface DesignPayload {
   name: string
   description?: string
   price?: string
-  shape_id?: string
+  shape?: string
   shapename?: string
   measurements?: string
   collectionId?: string
@@ -243,7 +243,6 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
       image_urls: toTextValue(collectionForm.image_urls),
       releaseDate: toTextValue(collectionForm.releaseDate),
       exclusive: toTextValue(collectionForm.exclusive),
-      isComplete: toTextValue(collectionForm.isComplete),
     }
 
     try {

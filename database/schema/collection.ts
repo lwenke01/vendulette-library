@@ -18,6 +18,7 @@ export const collections = sqliteTable('Collections', {
   releaseDate: text('releaseDate'),
   exclusive: text('exclusive'),
   isComplete: text('isComplete'),
+  last_updated_at: text('last_updated_at'),
 })
 
 export type Collection = InferSelectModel<typeof collections>
