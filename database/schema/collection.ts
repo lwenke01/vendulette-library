@@ -17,7 +17,11 @@ export const collections = sqliteTable('Collections', {
   image_urls: text('image_urls'),
   releaseDate: text('releaseDate'),
   exclusive: text('exclusive'),
-})
-
+  isComplete: integer('isComplete').notNull().default(0),
+  last_updated_at: text('last_updated_at'),
+  link: text('link'),
+});
 export type Collection = InferSelectModel<typeof collections>
 export const collectionInsertSchema = createInsertSchema(collections)
+
+
