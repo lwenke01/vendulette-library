@@ -30,3 +30,6 @@ DEV = "true"
 BETTER_AUTH_URL = "http://localhost:5173"
 PUBLIC_IMAGE_BASE_URL = "https://img.vendulette.com"
 
+[[services]]
+binding = "IMAGE_WORKER"
+service = "vendula-image-worker"
