@@ -6,13 +6,16 @@ main = "./worker.ts"
 assets = { directory = "./build/client/" }
 preview_urls = true
 
+routes = [
+  { pattern = "api.vendulette.com/*", custom_domain = true }
+]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "vendula-bags-db"
 database_id = "47e3b618-2d95-47a6-9a4b-16f6d9197d86"
 migrations_dir = "database/drizzle"
 remote = true
-
 
 [[r2_buckets]]
 binding = "R2"
@@ -25,4 +28,5 @@ enabled = true
 [vars]
 DEV = "true"
 BETTER_AUTH_URL = "http://localhost:5173"
+PUBLIC_IMAGE_BASE_URL = "https://img.vendulette.com"
 
