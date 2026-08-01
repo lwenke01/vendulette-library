@@ -1,4 +1,4 @@
-name = "hono-react-router"
+name ='hono-react-router02'
 workers_dev = true
 compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
