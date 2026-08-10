@@ -782,13 +782,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
             </span>
 
-            <button
+            {/* <button
               className="btn btn-sm btn-outline-dark"
               onClick={() => setShowAdmin(true)}
               type="button"
             >
               Admin
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>

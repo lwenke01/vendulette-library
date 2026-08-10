@@ -688,7 +688,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
 
-            <div className="card shadow-sm border">
+            {/* <div className="card shadow-sm border">
               <div className="card-header bg-light">
                 <h2 className="h6 fw-semibold mb-0">Admin shortcuts</h2>
               </div>
@@ -741,7 +741,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                   Create shape
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
