@@ -1,8 +1,6 @@
-// connect to route.ts & create api route to db
-
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
-import type { Route } from './+types/buy'
+import type { Route } from './+types/buy.form'
 import { useInfiniteCollections } from './useInfiniteCollections'
 
 export function meta(_: Route.MetaArgs) {

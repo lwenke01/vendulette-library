@@ -10,6 +10,7 @@ export const shapes = sqliteTable('Shapes', {
   name_friendly: text('name_friendly'),
   size: text('size'),
   description: text('description'),
+  last_updated_at: text('last_updated_at'),
 })
 
 export type Shape = InferSelectModel<typeof shapes>
