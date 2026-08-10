@@ -939,10 +939,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                     src={collectionPhoto}
                                     alt={col.name}
                                     loading="lazy"
-                                    width={72}
-                                    height={72}
+                                    width={150}
+                                    height={150}
                                     className="rounded border flex-shrink-0"
-                                    style={{ width: 72, height: 72, objectFit: 'cover', cursor: 'pointer' }}
+                                    style={{ width: 150, height: 150, objectFit: 'cover', cursor: 'pointer' }}
                                     onClick={() => openLightbox([collectionPhoto], 0)}
                                   />
                                 )}
@@ -953,8 +953,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                   </p>
                                   <h3 className="h6 fw-bold mb-1">{col.name}</h3>
                                   <p className="mb-0 small text-muted">
-                                    {col.season || 'Unknown'}
-                                    {col.series ? ` · ${col.series}` : ''}
+                                    {col.description}
+                                    {/* {col.season || 'Unknown'}
+                                    {col.series ? ` · ${col.series}` : ''} */}
                                   </p>
                                 </div>
                               </div>
@@ -963,15 +964,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 to={`/collection/${col.id}`}
                                 className="btn btn-sm btn-outline-secondary flex-shrink-0"
                               >
-                                View
+                                View Collection
                               </Link>
                             </div>
 
-                            {col.description && (
-                              <div className="px-3 pt-3 pb-1">
-                                <p className="small text-muted mb-0">{col.description}</p>
-                              </div>
-                            )}
+                        
 
                             {designs.length > 0 && (
                               <div className="card-body pt-2">
