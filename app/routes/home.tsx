@@ -8,7 +8,7 @@ export function meta(_: Route.MetaArgs) {
     { title: 'Vendula London Handbag Library' },
     {
       name: 'description',
-      content: 'An archives library of all seasons, designs, collections of Vendula London bags',
+      content: 'An archives library of all seasons, designs, collections of Vendula London bags for all the Vendulettes out there',
     },
   ]
 }
@@ -712,8 +712,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       })
       .sort(
         (a: any, b: any) =>
-          Number(b.releaseyear ?? b.release_year ?? 0) -
-          Number(a.releaseyear ?? a.release_year ?? 0),
+          Number(b.season ?? b.season ?? 0) -
+          Number(a.season ?? a.season ?? 0),
       )
   }, [normalizedCollections, search, season, series, shape])
 
@@ -773,16 +773,21 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-    <nav className="navbar navbar-expand-lg fixed-top  bg-danger-subtle border-bottom border-body" style={{ backgroundColor: '#da7679' }}> 
-      {/* <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle"> */}
+    {/* <nav className="navbar navbar-expand-lg sticky-top  bg-danger-subtle border-bottom border-body" style={{ backgroundColor: '#da7679' }}>  */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
         <div className="container-xl">
           <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
-
-          <div className="ms-auto d-flex align-items-center gap-2">
-            <span className="badge bg-secondary rounded-pill">
+ <span className="badge bg-secondary rounded-pill px-8">
               {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
             </span>
-
+          <div className="ms-auto d-flex align-items-center gap-2">
+         <span className="fw-light fs-6 pe-8 mb-0">
+            Want to help build out the Vendula library? Email me at <a
+  href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
+>
+ hello@vendulette.com
+</a>
+            </span>
             {/* <button
               className="btn btn-sm btn-outline-dark"
               onClick={() => setShowAdmin(true)}
@@ -791,6 +796,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               Admin
             </button> */}
           </div>
+         
         </div>
       </nav>
 
@@ -901,10 +907,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </aside>
 
           <main className="col-lg-9">
-            <h1 className="h4 fw-bold mb-4">Vendula London Handbag Library</h1>
+            {/* <h1 className="h4 fw-bold  static-top  mt-6  bg-danger-subtle border-bottom border-body">Vendula London Handbag Library</h1> */}
 
             {years.length === 0 ? (
-              <div className="text-center py-5 text-muted">
+              <div className="text-center py-5  px-5 text-muted">
                 <div className="mb-2" style={{ fontSize: '2rem' }}>
                   🔍
                 </div>
@@ -956,19 +962,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                     {col.season || 'Unknown'}
                                   </p>
                                      {designs.length > 0 && (
-                                      <p className="small fw-semibold text-muted mb-2">
+                                    <span className="badge rounded-pill text-bg-secondary">
                                   {designs.length} design{designs.length !== 1 ? 's' : ''}
-                                </p>)}
+                                </span>)}
 
                                   </div>
-                                  <p className="mb-0 small text-muted fw-medium">
+                                  {/* <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}
                                   </p>
                                      {designs.length > 0 && (
                                       <p className="small fw-semibold text-muted mb-2">
                                   {designs.length} design{designs.length !== 1 ? 's' : ''}
                                 </p>
-                                     )}
+                                     )} */}
                                   <p className="mb-0 small text-muted">
                                     {col.description}
                                     {/* {col.season || 'Unknown'}
@@ -989,9 +995,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
                             {designs.length > 0 && (
                               <div className="card-body pt-2">
-                                <p className="small fw-semibold text-muted mb-2">
+                                {/* <p className="small fw-semibold text-muted mb-2">
                                   {designs.length} design{designs.length !== 1 ? 's' : ''}
-                                </p>
+                                </p> */}
 
                                 <div className="row g-3">
                                   {designs.map((d: any) => {
