@@ -60,7 +60,7 @@ interface DesignPayload {
   name: string
   description?: string
   price?: string
-  shape?: string
+  shape_id?: string
   shapename?: string
   measurements?: string
   collectionId?: string
@@ -99,7 +99,7 @@ function AdminPanel({
     name: '',
     description: '',
     price: '',
-    shape: '',
+    shape_id: '',
     shapename: '',
     measurements: '',
     collectionId: '',
@@ -440,7 +440,7 @@ function AdminPanel({
                           step="0.01"
                           value={curDesign.price ?? ''}
                           onChange={(e) => changeDesign('price', e.target.value)}
-                          placeholder="0.00"
+                          placeholder=""
                         />
                       </div>
 
@@ -507,7 +507,7 @@ function AdminPanel({
                               name: d.name || '',
                               description: d.description || '',
                               price: d.price != null ? String(d.price) : '',
-                              shape: d.shape || '',
+                              shape: d.shape_id || '',
                               shapename: d.shapename || '',
                               measurements: d.measurements || '',
                               collectionId: d.collectionId || '',

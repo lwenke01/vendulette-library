@@ -72,10 +72,16 @@ export const vendulaCollectionsGet = F.createHandlers(async (c) => {
               'description', d.description,
               'image_urls', d.image_urls,
               'price', d.price,
-              'release_year', d.release_year,
-              'categories', d.categories,
+              'release_year', c.release_year,
               'shape_name_overwrite',d.shape_name_overwrite,
               'shape_measurements_overwrite',d.shape_measurements_overwrite,
+              'shape_size_overwrite',d.shape_size_overwrite,
+              'shape_details_overwrite',d.shape_details_overwrite,
+              'exclusive_design',d.exclusive_design,
+              'main_colour',d.main_colour,
+              'product_id',d.product_id,
+              'sku',d.sku,
+              'isComplete',c.isComplete,
               'shape_name', s.name,
               'measurements', s.measurements,
               'shape_category', s.category,
@@ -151,7 +157,8 @@ export const vendulaDesignsGet = F.createHandlers(async (c) => {
       C.series AS collection_series,
       S.name AS shape_name,
       S.measurements,
-      S.category AS shape_category
+      S.category AS shape_category,
+       S.size AS shape_size
     FROM Designs D
     LEFT JOIN Collections C ON C.id = D.collection_id
     LEFT JOIN Shapes S ON S.id = D.shape_id
@@ -170,11 +177,12 @@ export const vendulaDesignsGet = F.createHandlers(async (c) => {
 })
 
 export const vendulaDesignsPost = F.createHandlers(async (c) => {
-  const { collection_id, shape_id,description, image_urls, price, release_year, categories,shape_name_overwrite,shape_measurements_overwrite } =
+  const { collection_id, shape_id, name, description, image_urls, price, shape_name_overwrite,shape_measurements_overwrite,shape_size_overwrite,shape_details_overwrite,exclusive_design,main_colour,product_id,sku } =
     await c.req.json()
 
   await c.env.DB.prepare(
-    'INSERT INTO Designs (collection_id, shape_id, name, description, image_urls, price, release_year, categories,shape_name_overwrite,shape_measurements_overwrite) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)'
+    'INSERT INTO Designs (collection_id, shape_id, name, description, image_urls, price,shape_name_overwrite,shape_measurements_overwrite,shape_size_overwrite,shape_details_overwrite,exclusive_design,main_colour,product_id,sku) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)'
+
   )
     .bind(
       collection_id,
@@ -183,8 +191,15 @@ export const vendulaDesignsPost = F.createHandlers(async (c) => {
       description ?? null,
       JSON.stringify(image_urls ?? []),
       price,
-      release_year,
-      JSON.stringify(categories ?? [])
+      shape_name_overwrite,
+      shape_measurements_overwrite,
+      shape_size_overwrite,
+      shape_details_overwrite,
+      exclusive_design,
+      main_colour,
+      product_id,
+      sku
+     
     )
     .run()
 
@@ -193,11 +208,11 @@ export const vendulaDesignsPost = F.createHandlers(async (c) => {
 
 export const vendulaDesignsPut = F.createHandlers(async (c) => {
   const id = c.req.param('id')
-  const { collection_id, shape_id, name, description, image_urls, price, release_year, categories,shape_name_overwrite,shape_measurements_overwrite } =
+  const { collection_id, shape_id, name, description, image_urls, price,shape_name_overwrite,shape_measurements_overwrite,shape_size_overwrite,shape_details_overwrite,exclusive_design,main_colour,product_id,sku } =
     await c.req.json()
 
   await c.env.DB.prepare(
-    'UPDATE Designs SET collection_id=?, shape_id=?, name=?, description=?, image_urls=?, price=?, release_year=?, categories=?,shape_name_overwrite?,shape_measurements_overwrite WHERE id=?'
+    'UPDATE Designs SET collection_id=?, shape_id=?, name=?, description=?, image_urls=?, price=?, shape_name_overwrite=?,shape_measurements_overwrite=?,shape_size_overwrite=?,shape_details_overwrite=?,exclusive_design=?,main_colour=?,product_id=?,sku=? WHERE id=?'
   )
     .bind(
       collection_id,
@@ -206,10 +221,14 @@ export const vendulaDesignsPut = F.createHandlers(async (c) => {
       description ?? null,
       JSON.stringify(image_urls ?? []),
       price,
-      release_year,
-      JSON.stringify(categories ?? []),
       shape_name_overwrite ?? null,
       shape_measurements_overwrite ?? null,
+      shape_size_overwrite ?? null,
+      shape_details_overwrite ?? null,
+      exclusive_design ?? null,
+      main_colour ?? null,
+      product_id ?? null,
+      sku ?? null,
 
       id
     )
@@ -227,7 +246,7 @@ export const vendulaShapesPost = F.createHandlers(async (c) => {
   const { name, measurements, category,name_friendly,size,description } = await c.req.json()
   const categoryToStore = Array.isArray(category) ? JSON.stringify(category) : (category ?? '[]')
 
-  await c.env.DB.prepare('INSERT INTO Shapes (name, measurements, category, name_friendly,size,description) VALUES (?, ?, ?,?,?,?)')
+  await c.env.DB.prepare('INSERT INTO Shapes (name, measurements, category, name_friendly,size,description,) VALUES (?, ?, ?,?,?,?)')
     .bind(name, measurements, categoryToStore,name_friendly,size,description)
     .run()
 
@@ -272,14 +291,15 @@ export const vendulaCollectionsPost = F.createHandlers(async (c) => {
     image_urls,
     releaseDate,
     exclusive,
+    isComplete,
   } = body
 
   await c.env.DB.prepare(`
     INSERT INTO Collections (
       name, description, season, series, edition, release_year,
-      themes, colours, name_friendly, type, image_urls, releaseDate, exclusive
+      themes, colours, name_friendly, type, image_urls, releaseDate, exclusive, isComplete
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
   `)
     .bind(
       name,
@@ -318,12 +338,13 @@ export const vendulaCollectionsPut = F.createHandlers(async (c) => {
     image_urls,
     releaseDate,
     exclusive,
+    isComplete,
   } = body
 
   await c.env.DB.prepare(`
     UPDATE Collections SET
       name=?, description=?, season=?, series=?, edition=?, release_year=?,
-      themes=?, colours=?, name_friendly=?, type=?, image_urls=?, releaseDate=?, exclusive=?
+      themes=?, colours=?, name_friendly=?, type=?, image_urls=?, releaseDate=?, exclusive=?,   isComplete=?,
     WHERE id=?
   `)
     .bind(
@@ -340,6 +361,7 @@ export const vendulaCollectionsPut = F.createHandlers(async (c) => {
       JSON.stringify(image_urls ?? []),
       releaseDate,
       exclusive,
+      isComplete,
       id
     )
     .run()

@@ -41,6 +41,7 @@ export const setHandlers = (app: Hono<HonoENV>) => {
   apiHandler.post('/collections', ...vendulaCollectionsPost)
   apiHandler.put('/admin/collections/:id', ...vendulaCollectionsPut)
 
+
      //apiHandler.get('/stockists', ...vendulaCollectionsGet)
   // apiHandler.get('/stockists/form', ...vendulaCollectionsGet)
 
@@ -48,9 +49,10 @@ export const setHandlers = (app: Hono<HonoENV>) => {
   apiHandler.post('/designs', ...vendulaDesignsPost)
   apiHandler.put('/admin/designs/:id', ...vendulaDesignsPut)
 
+
   apiHandler.get('/shapes', ...vendulaShapesGet)
   apiHandler.post('/shapes', ...vendulaShapesPost)
-  apiHandler.post('/shapes', ...vendulaShapesPut)
+  apiHandler.post('/admin/shapes/:id', ...vendulaShapesPut)
 
   vendulaShapesPut
   app.route('/api', apiHandler)
