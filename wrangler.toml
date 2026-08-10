@@ -6,9 +6,7 @@ main = "./worker.ts"
 assets = { directory = "./build/client/" }
 preview_urls = true
 
-routes = [
-  { pattern = "api.vendulette.com/*", custom_domain = true }
-]
+
 
 [[d1_databases]]
 binding = "DB"
