@@ -773,7 +773,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
+    <nav className="navbar navbar-expand-lg fixed-top  bg-danger-subtle border-bottom border-body" style={{ backgroundColor: '#da7679' }}> 
+      {/* <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle"> */}
         <div className="container-xl">
           <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
 
@@ -948,10 +949,26 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 )}
 
                                 <div>
+                                 
+                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
+                                  <div className="ms-auto d-flex align-items-center gap-2">
+ <p className="mb-0 small text-muted fw-medium">
+                                    {col.season || 'Unknown'}
+                                  </p>
+                                     {designs.length > 0 && (
+                                      <p className="small fw-semibold text-muted mb-2">
+                                  {designs.length} design{designs.length !== 1 ? 's' : ''}
+                                </p>)}
+
+                                  </div>
                                   <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}
                                   </p>
-                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
+                                     {designs.length > 0 && (
+                                      <p className="small fw-semibold text-muted mb-2">
+                                  {designs.length} design{designs.length !== 1 ? 's' : ''}
+                                </p>
+                                     )}
                                   <p className="mb-0 small text-muted">
                                     {col.description}
                                     {/* {col.season || 'Unknown'}
@@ -1007,15 +1024,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                           </div>
 
                                           <div className="min-w-0 flex-grow-1">
-                                            <div className="fw-medium small text-truncate">
+                                            <div className="fw-medium small object-fit-scale rounded">
                                               {d.name}
                                             </div>
 
-                                            {d.price != null && d.price !== '' && (
+                                            {/* {d.price != null && d.price !== '' && (
                                               <div className="small text-muted">
                                                 £{Number(d.price).toFixed(2)}
                                               </div>
-                                            )}
+                                            )} */}
 
                                             {(d.shapename || d.shape) && (
                                               <div className="small text-muted text-truncate">

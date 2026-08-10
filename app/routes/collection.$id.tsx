@@ -402,7 +402,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
         <div className="container-xl">
           <Link to="/" className="navbar-brand fw-bold text-decoration-none">
             Vendula Handbag Library
@@ -412,13 +412,13 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
             <Link to="/" className="btn btn-sm btn-outline-secondary">
               Back to library
             </Link>
-            <button
+            {/* <button
               type="button"
               className="btn btn-sm btn-dark"
               onClick={() => setShowAdmin(true)}
             >
               Admin
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
@@ -499,7 +499,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
 
                 <button
                   type="button"
-                  className="btn btn-sm btn-dark"
+                  className="btn btn-sm btn-dark disabled invisible"
                   onClick={() => {
                     setDesignForm({
                       id: '',
