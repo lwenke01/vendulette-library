@@ -74,38 +74,34 @@ export default function App() {
             <img src="https://pub-af2fa0bccf8144cc980095caef793c08.r2.dev/website-images/generated-image(5).png" alt="" width="" height="" ></img>
         </a>
     </div>
-</nav> */}
-{/* <nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> */}
+</nav>  */}
+{/* <nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
   
-  {/* <img src="https://pub-af2fa0bccf8144cc980095caef793c08.r2.dev/website-images/generated-image(5).png" className="object-fit-xxl-contain border rounded" alt=""></img> */}
-  {/* <div className="container-fluid">
-    <a className="navbar-brand" href="#">Navbar</a>
-     <a className="navbar-brand" href="#">Navbar</a>
+
+  <div className="container-fluid">
+    <a className="navbar-brand pe-4 fw-bold " href="#">Vendulettes Handbag Haven</a>
+
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
       <span className="navbar-toggler-icon"></span>
     </button>
     <div className="collapse navbar-collapse" id="navbarSupportedContent">
       <ul className="navbar-nav me-auto mb-2 mb-lg-0">
         <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="#">hello</a>
+          <a className="nav-link active ps-5" aria-current="page" href="#">Vendula Handbag Library</a>
         </li>
-        <li className="nav-item">
-          <a className="nav-link" href="#">Link</a>
-        </li>
+     
         <li className="nav-item dropdown">
           <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
+            Resources
           </a>
           <ul className="dropdown-menu">
-            <li><a className="dropdown-item" href="#">Action</a></li>
-            <li><a className="dropdown-item" href="#">Another action</a></li>
+            <li><a className="dropdown-item" href="#">Where to Buy - Stockists</a></li>
+            <li><a className="dropdown-item" href="#">Shapes to Compare</a></li>
             <li className="dropdown-divider"></li>
-            <li><a className="dropdown-item" href="#">Something else here</a></li>
+            <li><a className="dropdown-item" href="#">Contact</a></li>
           </ul>
         </li>
-        <li className="nav-item">
-          <a className="nav-link disabled" aria-disabled="true">Disabled</a>
-        </li>
+      
       </ul>
       <form className="d-flex" role="search">
         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
@@ -114,7 +110,7 @@ export default function App() {
     </div>
   </div>
 </nav> */}
-      <header className="d-flex justify-content-end px-4 py-8">
+      {/* <header className="d-flex justify-content-end px-4 py-8 ">
        
    
         {isPending ? null : session ? (
@@ -124,7 +120,7 @@ export default function App() {
               onClick={() => signOut()}
               className="cursor-pointer rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 hover:bg-gray-100"
             >
-              Sign Out
+              {/* Sign Out 
             </button>
           </div>
         ) : (
@@ -134,7 +130,7 @@ export default function App() {
           >
             Sign In
           </Link>
-        )}
+        )} */}
     
            {/* <nav>
   <div className="nav nav-tabs" id="nav-tab" role="tablist">
@@ -146,10 +142,11 @@ export default function App() {
 </nav> */}
 {/* Vendula Handbag Library */}
 
-      </header>
+      {/* </header> */}
       <main>
         <Outlet />
       </main>
+      
     </>
   )
 }

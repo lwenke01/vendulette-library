@@ -8,7 +8,7 @@ export function meta(_: Route.MetaArgs) {
     { title: 'Vendula London Handbag Library' },
     {
       name: 'description',
-      content: 'An archives library of all seasons, designs, collections of Vendula London bags',
+      content: 'An archives library of all seasons, designs, collections of Vendula London bags for all the Vendulettes out there',
     },
   ]
 }
@@ -712,8 +712,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       })
       .sort(
         (a: any, b: any) =>
-          Number(b.releaseyear ?? b.release_year ?? 0) -
-          Number(a.releaseyear ?? a.release_year ?? 0),
+          Number(b.season ?? b.season ?? 0) -
+          Number(a.season ?? a.season ?? 0),
       )
   }, [normalizedCollections, search, season, series, shape])
 
@@ -773,23 +773,30 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
+    {/* <nav className="navbar navbar-expand-lg sticky-top  bg-danger-subtle border-bottom border-body" style={{ backgroundColor: '#da7679' }}>  */}
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
         <div className="container-xl">
           <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
-
-          <div className="ms-auto d-flex align-items-center gap-2">
-            <span className="badge bg-secondary rounded-pill">
+ <span className="badge bg-secondary rounded-pill px-8">
               {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
             </span>
-
-            <button
+          <div className="ms-auto d-flex align-items-center gap-2">
+         <span className="fw-light fs-6 pe-8 mb-0">
+            Want to help build out the Vendula library? Email me at <a
+  href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
+>
+ hello@vendulette.com
+</a>
+            </span>
+            {/* <button
               className="btn btn-sm btn-outline-dark"
               onClick={() => setShowAdmin(true)}
               type="button"
             >
               Admin
-            </button>
+            </button> */}
           </div>
+         
         </div>
       </nav>
 
@@ -900,10 +907,10 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </aside>
 
           <main className="col-lg-9">
-            <h1 className="h4 fw-bold mb-4">Vendula London Handbag Library</h1>
+            {/* <h1 className="h4 fw-bold  static-top  mt-6  bg-danger-subtle border-bottom border-body">Vendula London Handbag Library</h1> */}
 
             {years.length === 0 ? (
-              <div className="text-center py-5 text-muted">
+              <div className="text-center py-5  px-5 text-muted">
                 <div className="mb-2" style={{ fontSize: '2rem' }}>
                   🔍
                 </div>
@@ -939,22 +946,39 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                     src={collectionPhoto}
                                     alt={col.name}
                                     loading="lazy"
-                                    width={72}
-                                    height={72}
+                                    width={150}
+                                    height={150}
                                     className="rounded border flex-shrink-0"
-                                    style={{ width: 72, height: 72, objectFit: 'cover', cursor: 'pointer' }}
+                                    style={{ width: 150, height: 150, objectFit: 'cover', cursor: 'pointer' }}
                                     onClick={() => openLightbox([collectionPhoto], 0)}
                                   />
                                 )}
 
                                 <div>
-                                  <p className="mb-0 small text-muted fw-medium">
+                                 
+                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
+                                  <div className="ms-auto d-flex align-items-center gap-2">
+ <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}
                                   </p>
-                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
-                                  <p className="mb-0 small text-muted">
+                                     {designs.length > 0 && (
+                                    <span className="badge rounded-pill text-bg-secondary">
+                                  {designs.length} design{designs.length !== 1 ? 's' : ''}
+                                </span>)}
+
+                                  </div>
+                                  {/* <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}
-                                    {col.series ? ` · ${col.series}` : ''}
+                                  </p>
+                                     {designs.length > 0 && (
+                                      <p className="small fw-semibold text-muted mb-2">
+                                  {designs.length} design{designs.length !== 1 ? 's' : ''}
+                                </p>
+                                     )} */}
+                                  <p className="mb-0 small text-muted">
+                                    {col.description}
+                                    {/* {col.season || 'Unknown'}
+                                    {col.series ? ` · ${col.series}` : ''} */}
                                   </p>
                                 </div>
                               </div>
@@ -963,21 +987,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 to={`/collection/${col.id}`}
                                 className="btn btn-sm btn-outline-secondary flex-shrink-0"
                               >
-                                View
+                                View Collection
                               </Link>
                             </div>
 
-                            {col.description && (
-                              <div className="px-3 pt-3 pb-1">
-                                <p className="small text-muted mb-0">{col.description}</p>
-                              </div>
-                            )}
+                        
 
                             {designs.length > 0 && (
                               <div className="card-body pt-2">
-                                <p className="small fw-semibold text-muted mb-2">
+                                {/* <p className="small fw-semibold text-muted mb-2">
                                   {designs.length} design{designs.length !== 1 ? 's' : ''}
-                                </p>
+                                </p> */}
 
                                 <div className="row g-3">
                                   {designs.map((d: any) => {
@@ -1010,15 +1030,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                           </div>
 
                                           <div className="min-w-0 flex-grow-1">
-                                            <div className="fw-medium small text-truncate">
+                                            <div className="fw-medium small object-fit-scale rounded">
                                               {d.name}
                                             </div>
 
-                                            {d.price != null && d.price !== '' && (
+                                            {/* {d.price != null && d.price !== '' && (
                                               <div className="small text-muted">
                                                 £{Number(d.price).toFixed(2)}
                                               </div>
-                                            )}
+                                            )} */}
 
                                             {(d.shapename || d.shape) && (
                                               <div className="small text-muted text-truncate">
