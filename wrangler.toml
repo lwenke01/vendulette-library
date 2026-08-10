@@ -1,4 +1,4 @@
-name = "hono-react-router"
+name ='hono-react-router'
 workers_dev = true
 compatibility_date = "2024-11-18"
 compatibility_flags = ["nodejs_compat"]
@@ -30,6 +30,4 @@ DEV = "true"
 BETTER_AUTH_URL = "http://localhost:5173"
 PUBLIC_IMAGE_BASE_URL = "https://img.vendulette.com"
 
-[[services]]
-binding = "IMAGE_WORKER"
-service = "vendula-image-worker"
+ 
