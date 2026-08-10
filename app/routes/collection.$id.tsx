@@ -571,7 +571,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                                     )}
                                     <button
                                       type="button"
-                                      className="btn btn-sm btn-outline-primary"
+                                      className="btn btn-sm btn-outline-primary d-none"
                                       onClick={() => {
                                         setDesignForm({
                                           id: design.id || '',
