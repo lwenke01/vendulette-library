@@ -79,7 +79,7 @@ export default function App() {
   
 
   <div className="container-fluid">
-    <a className="navbar-brand" href="#">Vendulettes Handbag Haven</a>
+    <a className="navbar-brand pe-4 fw-bold " href="#">Vendulettes Handbag Haven</a>
      {/* <a className="navbar-brand" href="#">Navbar</a> */}
     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
       <span className="navbar-toggler-icon"></span>
@@ -87,11 +87,11 @@ export default function App() {
     <div className="collapse navbar-collapse" id="navbarSupportedContent">
       <ul className="navbar-nav me-auto mb-2 mb-lg-0">
         <li className="nav-item">
-          <a className="nav-link active" aria-current="page" href="#">Vendula Handbag Library</a>
+          <a className="nav-link active ps-5" aria-current="page" href="#">Vendula Handbag Library</a>
         </li>
-        <li className="nav-item">
+        {/* <li className="nav-item">
           <a className="nav-link" href="#">Shapes</a>
-        </li>
+        </li> */}
         <li className="nav-item dropdown">
           <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             Resources
