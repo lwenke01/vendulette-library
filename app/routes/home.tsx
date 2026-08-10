@@ -957,6 +957,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 <div>
                                  
                                   <h3 className="h6 fw-bold mb-1">{col.name}</h3>
+                                  
                                   <div className="ms-auto d-flex align-items-center gap-2">
  <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}
@@ -987,7 +988,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 to={`/collection/${col.id}`}
                                 className="btn btn-sm btn-outline-secondary flex-shrink-0"
                               >
-                                View Collection
+                                View
                               </Link>
                             </div>
 
