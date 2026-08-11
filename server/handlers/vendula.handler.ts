@@ -2,6 +2,8 @@ import { createFactory } from 'hono/factory'
 
 const F = createFactory()
 
+const IMG_BASE_URL = 'https://img.vendulette.com'
+
 function safeJson(value: any, fallback: any[] = []) {
   if (Array.isArray(value)) return value
   if (typeof value !== 'string' || !value.trim()) return fallback
@@ -67,6 +69,20 @@ function parseLimit(raw: string | null) {
   if (!Number.isFinite(limit) || limit <= 0) limit = 500
   if (limit > 1000) limit = 1000
   return limit
+}
+
+/**
+ * Generate image URL pattern: https://img.vendulette.com/collections/{collection_id}/designs/{design_id}/{index}.png
+ */
+function generateDesignImageUrl(collectionId: number, designId: number, index: number = 0): string {
+  return `${IMG_BASE_URL}/collections/${collectionId}/designs/${designId}/${index}.png`
+}
+
+/**
+ * Generate multiple image URLs for a design
+ */
+function generateDesignImageUrls(collectionId: number, designId: number, count: number = 1): string[] {
+  return Array.from({ length: count }, (_, i) => generateDesignImageUrl(collectionId, designId, i))
 }
 
 export const vendulaCollectionsGet = F.createHandlers(async (c) => {
@@ -273,13 +289,14 @@ export const vendulaDesignsPost = F.createHandlers(async (c) => {
     product_category,
   } = await c.req.json()
 
-  await c.env.DB.prepare(
+  const designResult = await c.env.DB.prepare(
     `INSERT INTO Designs (
       collection_id, shape_id, name, description, image_urls, price, currency,
       shape_name_overwrite, shape_measurements_overwrite, shape_size_overwrite,
       shape_details_overwrite, exclusive_design, main_colour, product_id, sku,
       season, product_category
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    RETURNING id`
   )
     .bind(
       collection_id,
@@ -302,7 +319,34 @@ export const vendulaDesignsPost = F.createHandlers(async (c) => {
     )
     .run()
 
-  return c.json({ success: true }, 201)
+  const designId = designResult.meta?.last_row_id as number | undefined
+
+  // Auto-generate DesignImages entries if image_urls provided
+  if (designId && image_urls && Array.isArray(image_urls) && image_urls.length > 0) {
+    const imageEntries = image_urls.map((url: string, index: number) => {
+      const publicUrl = url.startsWith('http') ? url : generateDesignImageUrl(collection_id, designId, index)
+      return [
+        designId,
+        collection_id,
+        season,
+        publicUrl,
+        `${name} - Image ${index + 1}`,
+        index,
+        index === 0 ? 1 : 0,
+      ]
+    })
+
+    await c.env.DB.batch(
+      imageEntries.map((entry: any[]) =>
+        c.env.DB.prepare(
+          `INSERT INTO DesignImages (design_id, collection_id, season, public_url, alt_text, sort_order, is_primary)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        ).bind(...entry)
+      )
+    )
+  }
+
+  return c.json({ success: true, design_id: designId }, 201)
 })
 
 export const vendulaDesignsPut = F.createHandlers(async (c) => {
@@ -512,6 +556,84 @@ export const vendulaCollectionsPut = F.createHandlers(async (c) => {
       id
     )
     .run()
+
+  return c.json({ success: true })
+})
+
+/**
+ * POST /api/designs/:id/images
+ * Add images to a design (auto-generates URLs in the vendulette.com pattern)
+ */
+export const vendulaDesignImagesPost = F.createHandlers(async (c) => {
+  const designId = parseInt(c.req.param('id'))
+  const { images } = await c.req.json() as { images: Array<{ url?: string; alt_text?: string; is_primary?: boolean }> }
+
+  if (!images || !Array.isArray(images)) {
+    return c.json({ error: 'Invalid images array' }, 400)
+  }
+
+  // Get design to find collection_id
+  const design = await c.env.DB.prepare('SELECT collection_id, season FROM Designs WHERE id = ?').bind(designId).first()
+  if (!design) {
+    return c.json({ error: 'Design not found' }, 404)
+  }
+
+  const collectionId = design.collection_id as number
+  const season = design.season as string | null
+
+  // Get current max sort_order
+  const maxSort = await c.env.DB.prepare('SELECT MAX(sort_order) as max_sort FROM DesignImages WHERE design_id = ?').bind(designId).first()
+  const currentMaxSort = (maxSort?.max_sort as number) ?? -1
+
+  const imageEntries = images.map((img, index) => {
+    const publicUrl = img.url ?? generateDesignImageUrl(collectionId, designId, currentMaxSort + index + 1)
+    return [
+      designId,
+      collectionId,
+      season,
+      publicUrl,
+      img.alt_text ?? `Design ${designId} - Image ${index + 1}`,
+      currentMaxSort + index + 1,
+      img.is_primary ? 1 : 0,
+    ]
+  })
+
+  await c.env.DB.batch(
+    imageEntries.map((entry: any[]) =>
+      c.env.DB.prepare(
+        `INSERT INTO DesignImages (design_id, collection_id, season, public_url, alt_text, sort_order, is_primary)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      ).bind(...entry)
+    )
+  )
+
+  return c.json({ success: true, count: images.length }, 201)
+})
+
+/**
+ * GET /api/designs/:id/images
+ * Get all images for a design
+ */
+export const vendulaDesignImagesGet = F.createHandlers(async (c) => {
+  const designId = parseInt(c.req.param('id'))
+
+  const { results } = await c.env.DB.prepare(
+    'SELECT * FROM DesignImages WHERE design_id = ? ORDER BY is_primary DESC, sort_order ASC'
+  )
+    .bind(designId)
+    .all()
+
+  return c.json(results)
+})
+
+/**
+ * DELETE /api/designs/images/:imageId
+ * Delete a specific design image
+ */
+export const vendulaDesignImageDelete = F.createHandlers(async (c) => {
+  const imageId = parseInt(c.req.param('imageId'))
+
+  await c.env.DB.prepare('DELETE FROM DesignImages WHERE id = ?').bind(imageId).run()
 
   return c.json({ success: true })
 })
