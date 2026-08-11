@@ -23,6 +23,7 @@ function formatCollection(row: any) {
 
 /**
  * Format a design row, using shape overrides when available, otherwise falling back to shape data.
+ * If shape_name is "unknown" or null/empty, use shape_name_overwrite in ProperCase.
  */
 function formatDesign(row: any) {
   // Determine final shape_name: prefer override if shape is unknown/missing
@@ -41,14 +42,23 @@ function formatDesign(row: any) {
     finalShapeName = shapeName
   }
 
+  // Use DesignImages if available, otherwise fall back to Designs.image_urls
+  let imageUrls: string[] = []
+  if (row.design_images && Array.isArray(row.design_images)) {
+    imageUrls = row.design_images.map((img: any) => img.public_url).filter(Boolean)
+  }
+  if (imageUrls.length === 0) {
+    imageUrls = safeJson(row.image_urls)
+  }
+
   return {
     ...row,
     shape_name: finalShapeName,
-    measurements: row.measurements ?? row.shape_measurements_overwrite ?? null,
+    measurements: row.shape_measurements_overwrite ?? row.measurements ?? null,
     size: row.shape_size_overwrite ?? row.shape_size ?? null,
     shape_category: row.shape_category ?? null,
-    shape_desc: row.shape_desc ?? row.shape_details_overwrite ??  row.description ?? null,
-    image_urls: safeJson(row.image_urls),
+    shape_desc: row.shape_details_overwrite ?? row.shape_desc ?? row.description ?? null,
+    image_urls: imageUrls,
   }
 }
 
@@ -108,12 +118,27 @@ export const vendulaCollectionsGet = F.createHandlers(async (c) => {
               'measurements', s.measurements,
               'shape_category', s.category,
               'shape_size', s.size,
-              'shape_desc', s.description
+              'shape_desc', s.description,
+              'design_images', (
+                SELECT json_group_array(
+                  json_object(
+                    'id', di.id,
+                    'public_url', di.public_url,
+                    'alt_text', di.alt_text,
+                    'sort_order', di.sort_order,
+                    'is_primary', di.is_primary
+                  )
+                )
+                FROM DesignImages di
+                WHERE di.design_id = d.id
+                ORDER BY di.is_primary DESC, di.sort_order ASC
+              )
             )
           )
           FROM Designs AS d
           LEFT JOIN Shapes AS s ON s.id = d.shape_id
           WHERE d.collection_id = c.id
+          ORDER BY d.name ASC
         ),
         '[]'
       ) AS designs
@@ -156,11 +181,25 @@ export const vendulaCollectionById = F.createHandlers(async (c) => {
            S.measurements,
            S.category as shape_category,
            S.size as shape_size,
-           S.description as shape_desc
+           S.description as shape_desc,
+           (
+             SELECT json_group_array(
+               json_object(
+                 'id', di.id,
+                 'public_url', di.public_url,
+                 'alt_text', di.alt_text,
+                 'sort_order', di.sort_order,
+                 'is_primary', di.is_primary
+               )
+             )
+             FROM DesignImages di
+             WHERE di.design_id = D.id
+             ORDER BY di.is_primary DESC, di.sort_order ASC
+           ) as design_images
     FROM Designs D
     LEFT JOIN Shapes S ON D.shape_id = S.id
     WHERE D.collection_id = ?
-    ORDER BY D.name ASC
+    ORDER BY D.id DESC
   `)
     .bind(id)
     .all()
@@ -183,7 +222,21 @@ export const vendulaDesignsGet = F.createHandlers(async (c) => {
       S.measurements,
       S.category AS shape_category,
       S.size AS shape_size,
-      S.description AS shape_desc
+      S.description AS shape_desc,
+      (
+        SELECT json_group_array(
+          json_object(
+            'id', di.id,
+            'public_url', di.public_url,
+            'alt_text', di.alt_text,
+            'sort_order', di.sort_order,
+            'is_primary', di.is_primary
+          )
+        )
+        FROM DesignImages di
+        WHERE di.design_id = D.id
+        ORDER BY di.is_primary DESC, di.sort_order ASC
+      ) as design_images
     FROM Designs D
     LEFT JOIN Collections C ON C.id = D.collection_id
     LEFT JOIN Shapes S ON S.id = D.shape_id
