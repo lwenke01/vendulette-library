@@ -1043,7 +1043,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
                                             {(d.shapename || d.shape) && (
                                               <div className="small text-muted text-truncate">
-                                                {d.shapename || d.shape}
+                                                {d.shapename || d.shape_name}
                                               </div>
                                             )}
 

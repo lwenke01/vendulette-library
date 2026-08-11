@@ -559,7 +559,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
                                   <div>
                                     <h3 className="h5 mb-1">{design.name}</h3>
                                     <div className="text-muted small">
-                                      {design.shapename || design.shape_name || design.shape_id|| 'No shape'}
+                                      {design.shapename || design.shape_name || design.shape_id|| ''}
                                     </div>
                                   </div>
 

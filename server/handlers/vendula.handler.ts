@@ -25,15 +25,29 @@ function formatCollection(row: any) {
  * Format a design row, using shape overrides when available, otherwise falling back to shape data.
  */
 function formatDesign(row: any) {
+  // Determine final shape_name: prefer override if shape is unknown/missing
+  let finalShapeName: string | null = null
+  const shapeName = row.shape_name
+  const shapeNameOverwrite = row.shape_name_overwrite
+
+  if (shapeNameOverwrite) {
+    // Convert to ProperCase: "my bag" → "My Bag"
+    finalShapeName = shapeNameOverwrite
+      .toLowerCase()
+      .split(' ')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  } else if (shapeName && shapeName.toLowerCase() !== 'unknown') {
+    finalShapeName = shapeName
+  }
+
   return {
     ...row,
-    // Use override if present, otherwise use shape data
-    shape_name: row.shape_name_overwrite ?? row.shape_name ?? null,
-    measurements: row.shape_measurements_overwrite ?? row.measurements ?? null,
+    shape_name: finalShapeName,
+    measurements: row.measurements ?? row.shape_measurements_overwrite ?? null,
     size: row.shape_size_overwrite ?? row.shape_size ?? null,
     shape_category: row.shape_category ?? null,
-    shape_desc: row.shape_details_overwrite ?? row.shape_desc ?? row.description ?? null,
-    // Parse JSON fields
+    shape_desc: row.shape_desc ?? row.shape_details_overwrite ??  row.description ?? null,
     image_urls: safeJson(row.image_urls),
   }
 }
@@ -146,7 +160,7 @@ export const vendulaCollectionById = F.createHandlers(async (c) => {
     FROM Designs D
     LEFT JOIN Shapes S ON D.shape_id = S.id
     WHERE D.collection_id = ?
-    ORDER BY D.id DESC
+    ORDER BY D.name ASC
   `)
     .bind(id)
     .all()
