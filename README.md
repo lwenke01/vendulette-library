@@ -255,3 +255,14 @@ text
 https://<your-worker-name>.<your-subdomain>.workers.dev
 
 Check DB connection: cd hono-react-router && wrangler d1 execute vendula-bags-db --remote "SELECT COUNT(*) as count FROM Collections;"
+
+## Wrangler commands for D1
+npm install
+npm install -D wrangler@latest
+npx wrangler logout
+npx wrangler login
+npx wrangler whoami
+npx wrangler dev
+
+pkill -f wrangler
+npx wrangler dev

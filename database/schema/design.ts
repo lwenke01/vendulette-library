@@ -23,6 +23,9 @@ export const designs = sqliteTable('Designs', {
   product_id: text('product_id'),
   sku: text('sku'),
   last_updated_at: text('last_updated_at'),
+  currency: text('currency').default('GBP'),
+  season: text('season'),
+
 
 })
 

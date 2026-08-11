@@ -20,6 +20,7 @@ export const collections = sqliteTable('Collections', {
   isComplete: integer('isComplete').notNull().default(0),
   last_updated_at: text('last_updated_at'),
   link: text('link'),
+  inLookbook: integer('inLookbook').notNull().default(1),
 });
 export type Collection = InferSelectModel<typeof collections>
 export const collectionInsertSchema = createInsertSchema(collections)
