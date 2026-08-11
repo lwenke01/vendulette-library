@@ -1,7 +1,5 @@
 import type { Repositories } from '../infrastructure/repositories'
-import { CollectionService } from './todo.service'
-import { DesignService } from './design.service'
-import { ShapeService } from './shape.service'
+import { CollectionService, DesignService, ShapeService } from './vendula.service'
 
 export type Services = {
   collectionService: CollectionService

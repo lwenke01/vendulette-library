@@ -36,25 +36,22 @@ export const setHandlers = (app: Hono<HonoENV>) => {
     })
   )
 
+  // Collections
   apiHandler.get('/collections', ...vendulaCollectionsGet)
   apiHandler.get('/collections/:id', ...vendulaCollectionById)
   apiHandler.post('/collections', ...vendulaCollectionsPost)
   apiHandler.put('/admin/collections/:id', ...vendulaCollectionsPut)
 
-
-     //apiHandler.get('/stockists', ...vendulaCollectionsGet)
-  // apiHandler.get('/stockists/form', ...vendulaCollectionsGet)
-
+  // Designs
   apiHandler.get('/designs', ...vendulaDesignsGet)
   apiHandler.post('/designs', ...vendulaDesignsPost)
   apiHandler.put('/admin/designs/:id', ...vendulaDesignsPut)
 
-
+  // Shapes
   apiHandler.get('/shapes', ...vendulaShapesGet)
   apiHandler.post('/shapes', ...vendulaShapesPost)
-  apiHandler.post('/admin/shapes/:id', ...vendulaShapesPut)
+  apiHandler.put('/admin/shapes/:id', ...vendulaShapesPut)
 
-  vendulaShapesPut
   app.route('/api', apiHandler)
   return app
 }
