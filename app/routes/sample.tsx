@@ -357,8 +357,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               <div className="d-flex flex-column gap-5">
                 {years.map((year) => (
                   <section key={year}>
-                    <h2 className="h6 fw-semibold text-muted text-uppercase border-bottom pb-2 mb-3">
-                      {year}
+                    <h2 className="h6 fw-semibold text-muted text-uppercase border-bottom pb-0 mb-0">
+                      {/* {year} */}
                     </h2>
 
                     <div className="d-flex flex-column gap-3">
@@ -377,7 +377,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                           <article key={col.id} className="card shadow-sm border">
                             <div className="card-header bg-light d-flex align-items-start justify-content-between gap-3 py-3">
                               <div className="d-flex gap-3 align-items-start">
-                                {collectionPhoto && (
+                                {/* {collectionPhoto && (
                                   <img
                                     src={collectionPhoto}
                                     alt={col.name}
@@ -388,13 +388,15 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                     style={{ width: 150, height: 150, objectFit: 'cover', cursor: 'pointer' }}
                                     onClick={() => openLightbox(collectionImages.length ? collectionImages : designImages, 0)}
                                   />
-                                )}
+                                )} */}
 
                                 <div>
-                                  <h3 className="h6 fw-bold mb-4">{col.name}</h3>
+                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
                                   <p className="mb-0 small text-muted fw-medium">
-                                    {col.season || 'Unknown'}{' '}
-                                    {col.series ? `· ${col.series}` : ''}
+                                     {year}{' '}
+                                    
+                                     {col.season ? `· ${col.season}` : ''} {' '}
+                                    {col.series ? `· ${col.series}` : ''}{' '}
                                       {col.type ? `· ${toProperCase(col.type)}` : ''}
                                   </p>
                                   {designs.length > 0 && (
@@ -402,9 +404,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                       {designs.length} design{designs.length !== 1 ? 's' : ''}
                                     </p>
                                   )}
-                                  <p className="mb-0 small text-muted">
+                                  {/* <p className="mb-0 small text-muted">
                                     {col.description}
-                                  </p>
+                                  </p> */}
                                 </div>
                               </div>
 
@@ -417,13 +419,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                             </div>
 {designs.length > 0 && (
   <div className="card-body pt-2">
-    <div className="d-flex flex-column gap-3">
+    <div className="d-flex flex-column gap-2">
       {designs.map((d: any) => {
         const images = uniq(parseImages(d.imageurls ?? d.image_urls))
         const thumb = images[0] ?? null
 
         return (
           <div key={d.id} className="d-flex gap-3 p-3 rounded border bg-white">
+           
             <div
               className="flex-shrink-0 rounded overflow-hidden bg-light border"
               style={{ width: 96, height: 96 }}
@@ -445,12 +448,23 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 </div>
               )}
             </div>
+            
+            
 
             <div className="min-w-0 flex-grow-1">
-              <div className="fw-medium" style={{ fontSize: '0.9rem' }}>{d.name}</div>
+              <div className="fw-medium d-flex flex-row justify-content-between" style={{ fontSize: '0.9rem' }}>
+               <h6 className="pb-0 m-0" > {d.name} </h6>
+              
+                                    
+           
+            <p className="fw-light pb-0 m-0">
+              {col.season  || ''}{' '} 
+              {year ? `| ${year}` : ''} </p>
+                
+                </div>
 
               <p className="mb-1 small text-muted fw-medium fst-italic" style={{ fontSize: '0.75rem' }}>
-                {d.shape_name || 'Unknown'}{' '}
+                {d.shape_name || ''}{' '}
                 {d.size ? `· ${d.size}` : ''}
               </p>
 
@@ -461,7 +475,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               )}
 
               {images.length > 1 && (
-                <div className="row g-1 mt-2">
+                <div className="row g-1 mt-2 d-none">
                   {images.slice(1, 6).map((src, idx) => (
                     <div key={idx} className="col-auto">
                       <img

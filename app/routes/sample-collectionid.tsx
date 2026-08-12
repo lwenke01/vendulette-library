@@ -456,7 +456,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
         <div className="container-xl">
           <Link to="/" className="navbar-brand fw-bold text-decoration-none">
             Vendula Handbag Library
