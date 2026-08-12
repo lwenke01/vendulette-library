@@ -1,0 +1,17 @@
+
+
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [ "http://localhost:5173",
+        "https://vendulette.com",
+        "https://www.vendulette.com",
+        "https://img.vendulette.com"],
+        "methods": ["GET","HEAD"],
+        "headers":["*"]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

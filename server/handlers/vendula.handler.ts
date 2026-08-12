@@ -2,7 +2,7 @@ import { createFactory } from 'hono/factory'
 
 const F = createFactory()
 
-const IMG_BASE_URL = 'https://img.vendulette.com'
+const IMG_BASE_URL = process.env.PUBLIC_IMAGE_BASE_URL || 'https://img.vendulette.com'
 
 function safeJson(value: any, fallback: any[] = []) {
   if (Array.isArray(value)) return value
@@ -76,13 +76,6 @@ function parseLimit(raw: string | null) {
  */
 function generateDesignImageUrl(collectionId: number, designId: number, index: number = 0): string {
   return `${IMG_BASE_URL}/collections/${collectionId}/designs/${designId}/${index}.png`
-}
-
-/**
- * Generate multiple image URLs for a design
- */
-function generateDesignImageUrls(collectionId: number, designId: number, count: number = 1): string[] {
-  return Array.from({ length: count }, (_, i) => generateDesignImageUrl(collectionId, designId, i))
 }
 
 export const vendulaCollectionsGet = F.createHandlers(async (c) => {
@@ -561,19 +554,23 @@ export const vendulaCollectionsPut = F.createHandlers(async (c) => {
 })
 
 /**
- * POST /api/designs/:id/images
- * Add images to a design (auto-generates URLs in the vendulette.com pattern)
+ * POST /api/admin/designs/:designId/images/upload
+ * Upload images to R2 and create DesignImages records
  */
-export const vendulaDesignImagesPost = F.createHandlers(async (c) => {
-  const designId = parseInt(c.req.param('id'))
-  const { images } = await c.req.json() as { images: Array<{ url?: string; alt_text?: string; is_primary?: boolean }> }
+export const vendulaDesignImagesUpload = F.createHandlers(async (c) => {
+  const designId = parseInt(c.req.param('designId'))
+  const formData = await c.req.formData()
+  const files = formData.getAll('files') as File[]
 
-  if (!images || !Array.isArray(images)) {
-    return c.json({ error: 'Invalid images array' }, 400)
+  if (!files || files.length === 0) {
+    return c.json({ error: 'No files provided' }, 400)
   }
 
   // Get design to find collection_id
-  const design = await c.env.DB.prepare('SELECT collection_id, season FROM Designs WHERE id = ?').bind(designId).first()
+  const design = await c.env.DB.prepare(
+    'SELECT collection_id, season FROM Designs WHERE id = ?'
+  ).bind(designId).first()
+
   if (!design) {
     return c.json({ error: 'Design not found' }, 404)
   }
@@ -581,59 +578,104 @@ export const vendulaDesignImagesPost = F.createHandlers(async (c) => {
   const collectionId = design.collection_id as number
   const season = design.season as string | null
 
-  // Get current max sort_order
-  const maxSort = await c.env.DB.prepare('SELECT MAX(sort_order) as max_sort FROM DesignImages WHERE design_id = ?').bind(designId).first()
+  // Get current max sort_order for this design
+  const maxSort = await c.env.DB.prepare(
+    'SELECT MAX(sort_order) as max_sort FROM DesignImages WHERE design_id = ?'
+  ).bind(designId).first()
+
   const currentMaxSort = (maxSort?.max_sort as number) ?? -1
 
-  const imageEntries = images.map((img, index) => {
-    const publicUrl = img.url ?? generateDesignImageUrl(collectionId, designId, currentMaxSort + index + 1)
-    return [
+  const uploadedImages = []
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    const arrayBuffer = await file.arrayBuffer()
+    const bytes = arrayBuffer.byteLength
+
+    // Generate R2 key: collections/{collection_id}/designs/{design_id}/{index}.png
+    const key = `collections/${collectionId}/designs/${designId}/${i}.png`
+
+    // Upload to R2
+    await c.env.R2.put(key, arrayBuffer, {
+      httpMetadata: {
+        contentType: file.type || 'image/png',
+      },
+    })
+
+    // Generate public URL
+    const publicUrl = generateDesignImageUrl(collectionId, designId, i)
+
+    // Create DesignImages record
+    await c.env.DB.prepare(
+      `INSERT INTO DesignImages (
+        design_id, collection_id, season, storage_key, public_url, alt_text, sort_order, is_primary, bytes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
       designId,
       collectionId,
       season,
+      key,
       publicUrl,
-      img.alt_text ?? `Design ${designId} - Image ${index + 1}`,
-      currentMaxSort + index + 1,
-      img.is_primary ? 1 : 0,
-    ]
-  })
+      `${file.name || `Image ${i + 1}`}`,
+      currentMaxSort + i + 1,
+      i === 0 ? 1 : 0, // First image is primary
+      bytes
+    ).run()
 
-  await c.env.DB.batch(
-    imageEntries.map((entry: any[]) =>
-      c.env.DB.prepare(
-        `INSERT INTO DesignImages (design_id, collection_id, season, public_url, alt_text, sort_order, is_primary)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`
-      ).bind(...entry)
-    )
-  )
+    uploadedImages.push({
+      key,
+      public_url: publicUrl,
+      size: bytes,
+    })
+  }
 
-  return c.json({ success: true, count: images.length }, 201)
+  return c.json({
+    success: true,
+    count: uploadedImages.length,
+    images: uploadedImages,
+  }, 201)
 })
 
 /**
- * GET /api/designs/:id/images
- * Get all images for a design
- */
-export const vendulaDesignImagesGet = F.createHandlers(async (c) => {
-  const designId = parseInt(c.req.param('id'))
-
-  const { results } = await c.env.DB.prepare(
-    'SELECT * FROM DesignImages WHERE design_id = ? ORDER BY is_primary DESC, sort_order ASC'
-  )
-    .bind(designId)
-    .all()
-
-  return c.json(results)
-})
-
-/**
- * DELETE /api/designs/images/:imageId
- * Delete a specific design image
+ * DELETE /api/admin/designs/images/:imageId
+ * Delete image from R2 and DesignImages table
  */
 export const vendulaDesignImageDelete = F.createHandlers(async (c) => {
   const imageId = parseInt(c.req.param('imageId'))
 
+  // Get image record
+  const image = await c.env.DB.prepare(
+    'SELECT storage_key, design_id FROM DesignImages WHERE id = ?'
+  ).bind(imageId).first()
+
+  if (!image) {
+    return c.json({ error: 'Image not found' }, 404)
+  }
+
+  // Delete from R2 if storage_key exists
+  if (image.storage_key) {
+    await c.env.R2.delete(image.storage_key)
+  }
+
+  // Delete from database
   await c.env.DB.prepare('DELETE FROM DesignImages WHERE id = ?').bind(imageId).run()
 
   return c.json({ success: true })
+})
+
+/**
+ * GET /api/admin/designs/:designId/images
+ * List all images for a design
+ */
+export const vendulaDesignImagesList = F.createHandlers(async (c) => {
+  const designId = parseInt(c.req.param('designId'))
+
+  const { results } = await c.env.DB.prepare(
+    `SELECT id, storage_key, public_url, alt_text, sort_order, is_primary, bytes, created_at
+     FROM DesignImages
+     WHERE design_id = ?
+     ORDER BY is_primary DESC, sort_order ASC`
+  ).bind(designId).all()
+
+  return c.json(results)
 })
