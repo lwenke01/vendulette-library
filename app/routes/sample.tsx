@@ -97,7 +97,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       new Set(
         normalizedCollections
           .flatMap((c: any) => c.designs)
-          .map((d: any) => String(d.shapename ?? d.shape ?? '').trim())
+          .map((d: any) => String(d.shape_name ?? d.shape ?? '').trim())
           .filter(Boolean),
       ),
     ).sort()
@@ -117,7 +117,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             .includes(term)
 
         const filteredDesigns = c.designs.filter((d: any) => {
-          const designShape = String(d.shapename ?? d.shape ?? '').trim().toLowerCase()
+          const designShape = String(d.shape_name?? d.shape ?? '').trim().toLowerCase()
 
           if (shape && designShape !== shape.toLowerCase()) return false
           if (!term) return true
@@ -125,7 +125,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           const haystack = [
             d.name,
             d.description,
-            d.shapename,
+            d.shape_name,
             d.shape,
             ...(Array.isArray(d.categories) ? d.categories : []),
           ]
@@ -227,13 +227,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 hello@vendulette.com
               </a>
             </span>
-            <button
+            {/* <button
               className="btn btn-sm btn-outline-dark"
               onClick={() => setShowAdmin(true)}
               type="button"
             >
               Admin
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
@@ -391,7 +391,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 )}
 
                                 <div>
-                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
+                                  <h3 className="h6 fw-bold mb-4">{col.name}</h3>
                                   <p className="mb-0 small text-muted fw-medium">
                                     {col.season || 'Unknown'}{' '}
                                     {col.series ? `· ${col.series}` : ''}
@@ -415,90 +415,82 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                                 View
                               </Link>
                             </div>
+{designs.length > 0 && (
+  <div className="card-body pt-2">
+    <div className="d-flex flex-column gap-3">
+      {designs.map((d: any) => {
+        const images = uniq(parseImages(d.imageurls ?? d.image_urls))
+        const thumb = images[0] ?? null
 
-                            {designs.length > 0 && (
-                              <div className="card-body pt-2">
-                                <div className="row g-3">
-                                  {designs.map((d: any) => {
-                                    const images = uniq(parseImages(d.imageurls ?? d.image_urls))
-                                    const thumb = images[0] ?? null
+        return (
+          <div key={d.id} className="d-flex gap-3 p-3 rounded border bg-white">
+            <div
+              className="flex-shrink-0 rounded overflow-hidden bg-light border"
+              style={{ width: 96, height: 96 }}
+            >
+              {thumb ? (
+                <img
+                  src={thumb}
+                  alt={d.name}
+                  loading="lazy"
+                  width={96}
+                  height={96}
+                  className="w-100 h-100"
+                  style={{ objectFit: 'cover', cursor: 'pointer' }}
+                  onClick={() => openLightbox(images, 0)}
+                />
+              ) : (
+                <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                  <small>No img</small>
+                </div>
+              )}
+            </div>
 
-                                    return (
-                                      <div key={d.id} className="col-sm-6 col-xl-4">
-                                        <div className="d-flex gap-3 p-2 rounded border bg-white h-100">
-                                          <div
-                                            className="flex-shrink-0 rounded overflow-hidden bg-light border"
-                                            style={{ width: 64, height: 64 }}
-                                          >
-                                            {thumb ? (
-                                              <img
-                                                src={thumb}
-                                                alt={d.name}
-                                                loading="lazy"
-                                                width={64}
-                                                height={64}
-                                                className="w-100 h-100"
-                                                style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                                onClick={() => openLightbox(images, 0)}
-                                              />
-                                            ) : (
-                                              <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
-                                                <small>No img</small>
-                                              </div>
-                                            )}
-                                          </div>
+            <div className="min-w-0 flex-grow-1">
+              <div className="fw-medium" style={{ fontSize: '0.9rem' }}>{d.name}</div>
 
-                                        <div className="min-w-0 flex-grow-1">
-  <div className="fw-medium small object-fit-scale rounded">{d.name}</div>
+              <p className="mb-1 small text-muted fw-medium fst-italic" style={{ fontSize: '0.75rem' }}>
+                {d.shape_name || 'Unknown'}{' '}
+                {d.size ? `· ${d.size}` : ''}
+              </p>
 
-  {/* {d.price != null && d.price !== '' && (
-    <div className="small text-muted">£{Number(d.price).toFixed(2)}</div>
-  )} */}
+              {d.measurements && (
+                <div className="small text-muted" style={{ fontSize: '0.7rem' }}>
+                  {d.measurements}
+                </div>
+              )}
 
-   <p className="mb-0 small text-muted fw-medium" style={{ fontSize: '0.75rem' }}>
-                                    {d.shape_name  || 'Unknown'}{' '}
-                                    {d.size ? `· ${d.size}` : ''}
-                                   
-                                  </p>
-
-
-
-{d.measurements && (
-  <div className="small text-muted fst-italic" style={{ fontSize: '0.75rem' }}>
-    {d.measurements}
+              {images.length > 1 && (
+                <div className="row g-1 mt-2">
+                  {images.slice(1, 6).map((src, idx) => (
+                    <div key={idx} className="col-auto">
+                      <img
+                        src={src}
+                        alt={`${d.name} ${idx + 2}`}
+                        loading="lazy"
+                        width={36}
+                        height={36}
+                        className="rounded border"
+                        style={{
+                          width: 36,
+                          height: 36,
+                          objectFit: 'cover',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => openLightbox(images, idx + 1)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
   </div>
 )}
-
-  {images.length > 1 && (
-    <div className="d-flex gap-1 mt-1 flex-wrap">
-      {images.slice(1, 5).map((src, idx) => (
-        <img
-          key={idx}
-          src={src}
-          alt={`${d.name} ${idx + 2}`}
-          loading="lazy"
-          width={28}
-          height={28}
-          className="rounded border"
-          style={{
-            width: 28,
-            height: 28,
-            objectFit: 'cover',
-            cursor: 'pointer',
-          }}
-          onClick={() => openLightbox(images, idx + 1)}
-        />
-      ))}
-    </div>
-  )}
-</div>
-                                        </div>
-                                      </div>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            )}
+          
                           </article>
                         )
                       })}

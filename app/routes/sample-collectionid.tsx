@@ -465,9 +465,9 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
             <Link to="/" className="btn btn-sm btn-outline-secondary">
               Back to library
             </Link>
-            <button type="button" className="btn btn-sm btn-dark" onClick={() => setShowAdmin(true)}>
+            {/* <button type="button" className="btn btn-sm btn-dark d-none" onClick={() => setShowAdmin(true)}>
               Admin
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
@@ -671,7 +671,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
 
-            <div className="card shadow-sm border">
+            <div className="card shadow-sm border d-none ">
               <div className="card-header bg-light">
                 <h2 className="h6 fw-semibold mb-0">Admin shortcuts</h2>
               </div>
