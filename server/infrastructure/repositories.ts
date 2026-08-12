@@ -1,6 +1,6 @@
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from '../../database/schema'
-import { D1CollectionRepository, D1DesignRepository, D1ShapeRepository } from './todo.repository'
+import { D1CollectionRepository, D1DesignRepository, D1ShapeRepository } from './vendula.repository'
 
 export type Repositories = {
   collectionRepository: D1CollectionRepository

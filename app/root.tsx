@@ -120,7 +120,7 @@ export default function App() {
               onClick={() => signOut()}
               className="cursor-pointer rounded border border-gray-300 bg-white px-3 py-1 text-sm text-gray-800 hover:bg-gray-100"
             >
-              {/* Sign Out 
+              Sign Out 
             </button>
           </div>
         ) : (
@@ -130,19 +130,19 @@ export default function App() {
           >
             Sign In
           </Link>
-        )} */}
+        )}
     
-           {/* <nav>
+           <nav>
   <div className="nav nav-tabs" id="nav-tab" role="tablist">
     <button className="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>
     <button className="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
     <button className="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
     <button className="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" data-bs-target="#nav-disabled" type="button" role="tab" aria-controls="nav-disabled" aria-selected="false" disabled>Disabled</button>
   </div>
-</nav> */}
-{/* Vendula Handbag Library */}
+</nav>
 
-      {/* </header> */}
+
+       </header> */}
       <main>
         <Outlet />
       </main>

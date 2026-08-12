@@ -25,8 +25,6 @@ CREATE TABLE IF NOT EXISTS Shapes (
     description TEXT
 );
 
-
-
 CREATE UNIQUE INDEX IF NOT EXISTS Shapes_name_unique
 ON Shapes (name);
 
@@ -38,18 +36,17 @@ CREATE TABLE IF NOT EXISTS Designs (
     description TEXT,
     image_urls TEXT,
     price REAL,
-     shape_name_overwrite TEXT, 
+    shape_name_overwrite TEXT, 
     shape_measurements_overwrite TEXT,
-     shape_size_overwrite TEXT, 
-     shape_details_overwrite TEXT, 
-     exclusive_design TEXT, 
-     main_colour TEXT, 
-     product_id TEXT,
+    shape_size_overwrite TEXT, 
+    shape_details_overwrite TEXT, 
+    exclusive_design TEXT, 
+    main_colour TEXT, 
+    product_id TEXT,
     sku TEXT,
-     last_updated_at TEXT,
-      currency TEXT DEFAULT 'GBP', 
-      season TEXT, 
+    last_updated_at TEXT,
+    currency TEXT DEFAULT 'GBP', 
+    season TEXT, 
     FOREIGN KEY (collection_id) REFERENCES Collections(id) ON DELETE CASCADE,
     FOREIGN KEY (shape_id) REFERENCES Shapes(id) ON DELETE SET NULL
 );
-
