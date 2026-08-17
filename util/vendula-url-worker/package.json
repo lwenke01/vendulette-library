@@ -1,0 +1,22 @@
+{
+  "name": "vendula-url-worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260813.1",
+    "@types/node": "^26.2.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.122.0"
+  },
+  "dependencies": {
+    "@cloudflare/puppeteer": "^0.0.11"
+  }
+}
+

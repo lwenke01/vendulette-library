@@ -1,0 +1,25 @@
+name = "vendula-url-worker"
+main = "src/index.ts"
+
+compatibility_date = "2026-08-13"
+
+compatibility_flags = [
+  "nodejs_compat",
+  "no_websocket_standard_binary_type"
+]
+
+[browser]
+binding = "MYBROWSER"
+remote = true
+
+[[r2_buckets]]
+binding = "OUTPUT_BUCKET"
+bucket_name = "vendula-scraper-output"
+remote = true
+
+[triggers]
+crons = ["0 11 * * *"]
+
+[observability.logs]
+enabled = true
+invocation_logs = true
