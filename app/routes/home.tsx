@@ -67,6 +67,16 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const [lightboxImages, setLightboxImages] = useState<string[]>([])
   const [lightboxIndex, setLightboxIndex] = useState(0)
 
+  // Track which design accordions are open
+  const [openDesigns, setOpenDesigns] = useState<Record<number, boolean>>({})
+
+  const toggleDesign = (designId: number) => {
+    setOpenDesigns(prev => ({
+      ...prev,
+      [designId]: !prev[designId]
+    }))
+  }
+
   const normalizedCollections = useMemo(() => {
     return (Array.isArray(collections) ? collections : []).map((col: any) => {
       const designs = Array.isArray(col.designs) ? col.designs : []
@@ -227,13 +237,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 hello@vendulette.com
               </a>
             </span>
-            {/* <button
-              className="btn btn-sm btn-outline-dark"
-              onClick={() => setShowAdmin(true)}
-              type="button"
-            >
-              Admin
-            </button> */}
           </div>
         </div>
       </nav>
@@ -375,144 +378,195 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
                         return (
                           <article key={col.id} className="card shadow-sm border">
-                            <div className="card-header bg-light d-flex align-items-start justify-content-between gap-3 py-3">
-                              <div className="d-flex gap-3 align-items-start">
-                                {/* {collectionPhoto && (
-                                  <img
-                                    src={collectionPhoto}
-                                    alt={col.name}
-                                    loading="lazy"
-                                    width={150}
-                                    height={150}
-                                    className="rounded border flex-shrink-0"
-                                    style={{ width: 150, height: 150, objectFit: 'cover', cursor: 'pointer' }}
-                                    onClick={() => openLightbox(collectionImages.length ? collectionImages : designImages, 0)}
-                                  />
-                                )} */}
-
-                                <div>
-                                  <h3 className="h6 fw-bold mb-1">{col.name}</h3>
-                                  <p className="mb-0 small text-muted fw-medium">
-                                     {year}{' '}
-                                    
-                                     {col.season ? `· ${col.season}` : ''} {' '}
-                                    {col.series ? `· ${col.series}` : ''}{' '}
-                                      {col.type ? `· ${toProperCase(col.type)}` : ''}
+                            {/* Collection Banner */}
+                            {collectionPhoto && (
+                              <div 
+                                className="position-relative rounded-top overflow-hidden" 
+                                style={{ height: 280, cursor: 'pointer' }}
+                                onClick={() => openLightbox(collectionImages.length ? collectionImages : designImages, 0)}
+                              >
+                                <img
+                                  src={collectionPhoto}
+                                  alt={col.name}
+                                  loading="lazy"
+                                  className="w-100 h-100"
+                                  style={{ objectFit: 'cover', objectPosition: 'center' }}
+                                />
+                                {/* Gradient overlay */}
+                                <div className="position-absolute bottom-0 start-0 w-100 p-3" 
+                                     style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
+                                  <h3 className="text-white mb-1 fs-4">{col.name}</h3>
+                                  <p className="text-white text-opacity-75 mb-0 small">
+                                    {year} {col.season ? `· ${col.season}` : ''} {col.series ? `· ${col.series}` : ''} {col.type ? `· ${toProperCase(col.type)}` : ''}
                                   </p>
-                                  {designs.length > 0 && (
-                                    <p className="small fw-semibold text-muted mb-2">
-                                      {designs.length} design{designs.length !== 1 ? 's' : ''}
-                                    </p>
-                                  )}
-                                  {/* <p className="mb-0 small text-muted">
-                                    {col.description}
-                                  </p> */}
                                 </div>
                               </div>
+                            )}
+                            
+                            <div className="card-body pt-3">
+                              {designs.length > 0 && (
+                                <div className="accordion" id={`accordion-${col.id}`}>
+                                  {designs.map((d: any, idx: number) => {
+                                    const images = uniq(parseImages(d.imageurls ?? d.image_urls))
+                                    const thumb = images[0] ?? null
+                                    const isOpen = openDesigns[d.id]
 
-                              <Link
-                                to={`/collection/${col.id}`}
-                                className="btn btn-sm btn-outline-secondary flex-shrink-0"
-                              >
-                                View 
-                              </Link>
+                                    return (
+                                      <div key={d.id} className="accordion-item border mb-2 rounded">
+                                        <h2 className="accordion-header">
+                                          <button
+                                            className="accordion-button d-flex align-items-center gap-3 py-3"
+                                            type="button"
+                                            onClick={() => toggleDesign(d.id)}
+                                            aria-expanded={isOpen}
+                                            aria-controls={`design-collapse-${d.id}`}
+                                          >
+                                            {/* Thumbnail */}
+                                            <div
+                                              className="flex-shrink-0 rounded overflow-hidden bg-light border"
+                                              style={{ width: 64, height: 64 }}
+                                            >
+                                              {thumb ? (
+                                                <img
+                                                  src={thumb}
+                                                  alt={d.name}
+                                                  loading="lazy"
+                                                  width={64}
+                                                  height={64}
+                                                  className="w-100 h-100"
+                                                  style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                  onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    openLightbox(images, 0)
+                                                  }}
+                                                />
+                                              ) : (
+                                                <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                                  <small>No img</small>
+                                                </div>
+                                              )}
+                                            </div>
+
+                                            {/* Design info */}
+                                            <div className="flex-grow-1 text-start">
+                                              <div className="fw-medium" style={{ fontSize: '0.95rem' }}>
+                                                {d.name}
+                                              </div>
+                                              <p className="mb-0 small text-muted fw-medium" style={{ fontSize: '0.8rem' }}>
+                                                {d.shape_name || ''}{' '}
+                                                {d.size ? `· ${d.size}` : ''}
+                                                {d.measurements ? `· ${d.measurements}` : ''}
+                                              </p>
+                                            </div>
+
+                                            {/* Badge */}
+                                            <div className="flex-shrink-0">
+                                              <span className="badge bg-secondary">
+                                                {col.season || ''} {year ? `| ${year}` : ''}
+                                              </span>
+                                            </div>
+                                          </button>
+                                        </h2>
+                                        
+                                        {isOpen && (
+                                          <div
+                                            id={`design-collapse-${d.id}`}
+                                            className="accordion-collapse collapse show"
+                                          >
+                                            <div className="accordion-body bg-light">
+                                              <div className="row g-3">
+                                                {/* Images */}
+                                                {images.length > 0 && (
+                                                  <div className="col-md-4">
+                                                    <div className="rounded overflow-hidden border bg-white">
+                                                      <img
+                                                        src={images[0]}
+                                                        alt={d.name}
+                                                        loading="lazy"
+                                                        className="w-100"
+                                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                        onClick={() => openLightbox(images, 0)}
+                                                      />
+                                                    </div>
+                                                    {images.length > 1 && (
+                                                      <div className="row g-1 mt-2">
+                                                        {images.slice(1, 5).map((src, i) => (
+                                                          <div key={i} className="col-3">
+                                                            <img
+                                                              src={src}
+                                                              alt={`${d.name} ${i + 2}`}
+                                                              loading="lazy"
+                                                              className="rounded border w-100"
+                                                              style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                              onClick={() => openLightbox(images, i + 1)}
+                                                            />
+                                                          </div>
+                                                        ))}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                )}
+
+                                                {/* Details */}
+                                                <div className="col-md-8">
+                                                  <h6 className="fw-semibold mb-2">Details</h6>
+                                                  
+                                                  {d.shape_name && (
+                                                    <div className="mb-2">
+                                                      <span className="text-muted small">Shape:</span>{' '}
+                                                      <span className="fw-medium">{d.shape_name}</span>
+                                                    </div>
+                                                  )}
+                                                  
+                                                  {d.size && (
+                                                    <div className="mb-2">
+                                                      <span className="text-muted small">Size:</span>{' '}
+                                                      <span className="fw-medium">{d.size}</span>
+                                                    </div>
+                                                  )}
+                                                  
+                                                  {d.measurements && (
+                                                    <div className="mb-2">
+                                                      <span className="text-muted small">Dimensions:</span>{' '}
+                                                      <span className="fw-medium">{d.measurements}</span>
+                                                    </div>
+                                                  )}
+                                                  
+                                                  {d.description && (
+                                                    <div className="mb-2">
+                                                      <span className="text-muted small">Description:</span>{' '}
+                                                      <p className="mb-0 small">{d.description}</p>
+                                                    </div>
+                                                  )}
+
+                                                  {d.categories && Array.isArray(d.categories) && d.categories.length > 0 && (
+                                                    <div className="mb-2">
+                                                      <span className="text-muted small">Categories:</span>{' '}
+                                                      {d.categories.map((cat: string, i: number) => (
+                                                        <span key={i} className="badge bg-secondary me-1">{cat}</span>
+                                                      ))}
+                                                    </div>
+                                                  )}
+
+                                                  <div className="mt-3">
+                                                    <Link
+                                                      to={`/collection/${col.id}`}
+                                                      className="btn btn-sm btn-outline-secondary"
+                                                    >
+                                                      View Collection
+                                                    </Link>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              )}
                             </div>
-{designs.length > 0 && (
-  <div className="card-body pt-2">
-    <div className="d-flex flex-column gap-2">
-      {designs.map((d: any) => {
-        const images = uniq(parseImages(d.imageurls ?? d.image_urls))
-        const thumb = images[0] ?? null
-
-        return (
-          <div key={d.id} className="d-flex gap-3 p-3 rounded border bg-white">
-           
-            <div
-              className="flex-shrink-0 rounded overflow-hidden bg-light border"
-              style={{ width: 96, height: 96 }}
-            >
-              {thumb ? (
-                <img
-                  src={thumb}
-                  alt={d.name}
-                  loading="lazy"
-                  width={96}
-                  height={96}
-                  className="w-100 h-100"
-                  style={{ objectFit: 'cover', cursor: 'pointer' }}
-                  onClick={() => openLightbox(images, 0)}
-                />
-              ) : (
-                <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
-                  <small>No img</small>
-                </div>
-              )}
-            </div>
-            
-            
-
-            <div className="min-w-0 flex-grow-1">
-              <div className="fw-medium d-flex flex-row justify-content-between" style={{ fontSize: '0.9rem' }}>
-               <h6 className="pb-0 m-0" > {d.name} </h6>
-              
-                                    
-           
-            <p className="fw-light pb-0 m-0">
-              {col.season  || ''}{' '} 
-              {year ? `| ${year}` : ''} </p>
-                
-                </div>
-
-              <p className="mb-1 small text-muted fw-medium pb-2" style={{ fontSize: '0.75rem' }}>
-                {d.shape_name || ''}{' '}
-                {d.size ? `· ${d.size}` : ''}
-              </p>
-
-              {d.measurements && (
-                <div className="small text-muted" style={{ fontSize: '0.75rem' }}>
-                 Dimensions: {d.measurements}
-                </div>
-              )}
-
-                  <Link
-                                to={`/collection/${col.id}`}
-                                className="btn btn-sm btn-outline-secondary small text-muted flex-shrink-0 float-end"
-                              >
-                                View 
-                              </Link>
-                          
-
-              {images.length > 1 && (
-                <div className="row g-1 mt-2 d-none">
-                  {images.slice(1, 6).map((src, idx) => (
-                    <div key={idx} className="col-auto">
-                      <img
-                        src={src}
-                        alt={`${d.name} ${idx + 2}`}
-                        loading="lazy"
-                        width={36}
-                        height={36}
-                        className="rounded border"
-                        style={{
-                          width: 36,
-                          height: 36,
-                          objectFit: 'cover',
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => openLightbox(images, idx + 1)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  </div>
-)}
-          
                           </article>
                         )
                       })}
@@ -554,7 +608,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 />
               </div>
               <div className="modal-body">
-                {/* Admin content can be wired in from your existing AdminPanel component */}
                 <p className="text-muted mb-0">Admin tools coming soon.</p>
               </div>
             </div>
