@@ -9,6 +9,9 @@ export default [
   route('/sample', 'routes/sample.tsx'),
   route('/sign-in', 'routes/sign-in.tsx'),
   route('/sign-up', 'routes/sign-up.tsx'),
+    route('/viewAll', 'routes/all-designs-sort.tsx'),
+      route('/shapes', 'routes/shapes.tsx'),
+      route('/collections', 'routes/all-collections-sort.tsx'),
 
   //route('/stockists', 'routes/buy.tsx'),
  // route('/stockists/form', 'routes/buy.add.tsx'),

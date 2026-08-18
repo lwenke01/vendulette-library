@@ -75,7 +75,7 @@ export default function App() {
         </a>
     </div>
 </nav>  */}
-{/* <nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
+<nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
   
 
   <div className="container-fluid">
@@ -109,7 +109,7 @@ export default function App() {
       </form>
     </div>
   </div>
-</nav> */}
+</nav>
       {/* <header className="d-flex justify-content-end px-4 py-8 ">
        
    
@@ -132,7 +132,7 @@ export default function App() {
           </Link>
         )}
     
-           <nav>
+           <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top shadow-sm bg-danger-subtle">
   <div className="nav nav-tabs" id="nav-tab" role="tablist">
     <button className="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>
     <button className="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
