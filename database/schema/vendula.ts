@@ -95,3 +95,28 @@ export const designs = sqliteTable('Designs', {
 
 export type Design = InferSelectModel<typeof designs>
 export const designInsertSchema = createInsertSchema(designs)
+
+// ─────────────────────────────────────────────────────────────
+// DesignImages (new table for normalized image storage)
+// ─────────────────────────────────────────────────────────────
+export const designImages = sqliteTable('DesignImages', {
+  id: integer('id').primaryKey({ mode: 'autoincrement' }),
+  season: text('season'),
+  collectionId: integer('collection_id')
+    .notNull()
+    .references(() => collections.id, { onDelete: 'cascade' }),
+  designId: integer('design_id')
+    .notNull()
+    .references(() => designs.id, { onDelete: 'cascade' }),
+  storageKey: text('storage_key'),
+  publicUrl: text('public_url').notNull(),
+  altText: text('alt_text'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  isPrimary: integer('is_primary').notNull().default(0),
+  createdAt: text('created_at').notNull().default('CURRENT_TIMESTAMP'),
+  bytes: integer('bytes'),
+});
+
+export type DesignImage = InferSelectModel<typeof designImages>
+export const designImageInsertSchema = createInsertSchema(designImages)
+
