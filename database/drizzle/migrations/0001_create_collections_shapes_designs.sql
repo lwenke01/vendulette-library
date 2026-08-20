@@ -50,3 +50,25 @@ CREATE TABLE IF NOT EXISTS Designs (
     FOREIGN KEY (collection_id) REFERENCES Collections(id) ON DELETE CASCADE,
     FOREIGN KEY (shape_id) REFERENCES Shapes(id) ON DELETE SET NULL
 );
+
+-- Create seasons table to hold seasonal collections with image arrays
+CREATE TABLE IF NOT EXISTS seasons (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,              -- e.g., "Spring", "Autumn", "Holiday"
+  year INTEGER NOT NULL,           -- e.g., 2024, 2025
+  images TEXT NOT NULL DEFAULT '[]',  -- JSON array of image URLs/IDs from R2
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Add season reference to collections table
+ALTER TABLE collections ADD COLUMN season_id INTEGER REFERENCES seasons(id);
+
+-- Create index for faster lookups by season
+CREATE INDEX IF NOT EXISTS idx_collections_season ON collections(season_id);
+
+-- Optional: Seed some example seasons (remove if not needed)
+-- INSERT INTO seasons (name, year, images) VALUES
+--   ('Spring', 2024, '[]'),
+--   ('Autumn', 2024, '[]'),
+--   ('Holiday', 2024, '[]');

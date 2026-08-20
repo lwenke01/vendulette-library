@@ -267,6 +267,8 @@ npx wrangler dev
 pkill -f wrangler
 npx wrangler dev
 
+## Trigger db schema
+wrangler d1 execute vendula-bags-db --file=./migrations/004_update_collections_and_designs.sql
 
 ## Migrate Images
 
@@ -277,3 +279,4 @@ npx wrangler deploy
 curl -X POST https://image-migration-worker.{account}.workers.dev/migrate-design-images/bulk
 
 ### update remote table
+

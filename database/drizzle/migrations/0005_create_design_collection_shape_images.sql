@@ -1,0 +1,66 @@
+-- Migration: 0005_create_design_images
+-- Creates DesignImages table for normalized image storage
+
+CREATE TABLE IF NOT EXISTS DesignImages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    season TEXT,
+    collection_id INTEGER NOT NULL,
+    design_id INTEGER NOT NULL,
+    storage_key TEXT,
+    public_url TEXT NOT NULL,
+    alt_text TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_primary INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    bytes INTEGER,
+    FOREIGN KEY (design_id) REFERENCES Designs(id) ON DELETE CASCADE,
+    FOREIGN KEY (collection_id) REFERENCES Collections(id) ON DELETE CASCADE
+);
+
+-- Indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_design_images_design ON DesignImages(design_id);
+CREATE INDEX IF NOT EXISTS idx_design_images_collection ON DesignImages(collection_id);
+CREATE INDEX IF NOT EXISTS idx_design_images_primary ON DesignImages(is_primary);
+CREATE INDEX IF NOT EXISTS idx_design_images_sort ON DesignImages(sort_order);
+
+-- ─────────────────────────────────────────────────────────────
+-- Rollback instructions (manual)
+-- ─────────────────────────────────────────────────────────────
+-- DROP INDEX IF EXISTS idx_design_images_sort;
+-- DROP INDEX IF EXISTS idx_design_images_primary;
+-- DROP INDEX IF EXISTS idx_design_images_collection;
+-- DROP INDEX IF EXISTS idx_design_images_design;
+-- DROP TABLE IF EXISTS DesignImages;
+
+-- Collection images table (normalized, one row per image)
+CREATE TABLE IF NOT EXISTS collection_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  alt_text TEXT,
+  sort_order INTEGER DEFAULT 0,
+  is_primary BOOLEAN DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Shape images table (normalized, one row per image)
+CREATE TABLE IF NOT EXISTS shape_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  shape_id INTEGER NOT NULL REFERENCES shapes(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  alt_text TEXT,
+  sort_order INTEGER DEFAULT 0,
+  is_primary BOOLEAN DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for faster lookups
+CREATE INDEX IF NOT EXISTS idx_collection_images_collection ON collection_images(collection_id);
+CREATE INDEX IF NOT EXISTS idx_collection_images_primary ON collection_images(collection_id, is_primary);
+CREATE INDEX IF NOT EXISTS idx_shape_images_shape ON shape_images(shape_id);
+CREATE INDEX IF NOT EXISTS idx_shape_images_primary ON shape_images(shape_id, is_primary);
+
+-- Optional: If you have existing JSON image arrays in collections/shapes tables,
+-- you can migrate them with a script. For now, this creates the structure.

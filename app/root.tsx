@@ -19,13 +19,29 @@ export const links: Route.LinksFunction = () => [
     href: 'https://fonts.gstatic.com',
     crossOrigin: 'anonymous',
   },
- { 
-  rel:'preconnect',
-   href:'https://challenges.cloudflare.com',
- },
+  {
+    rel: 'preconnect',
+    href: 'https://challenges.cloudflare.com',
+  },
   {
     rel: 'stylesheet',
     href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Fleur+De+Leah&display=swap',
+  },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Luxurious+Script&display=swap',
+  },
+    {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Monoton&display=swap',
+  },
+   {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Sacramento&display=swap',
   },
   // { rel: 'stylesheet', href: stylesheet },
 ]
@@ -68,48 +84,225 @@ export default function App() {
 
   return (
     <>
-    {/* <nav className="navbar navbar-*">
-    <div>
-        <a className="navbar-brand" href="#">f
-            <img src="https://pub-af2fa0bccf8144cc980095caef793c08.r2.dev/website-images/generated-image(5).png" alt="" width="" height="" ></img>
-        </a>
-    </div>
-</nav>  */}
-{/* <nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
-  
+    
+<nav
+  className="navbar navbar-expand-lg fixed-top"
+  style={{
+    zIndex: 1040,
+    top: 0,
+    backgroundColor: '#cb2182',
 
-  <div className="container-fluid">
-    <a className="navbar-brand pe-4 fw-bold " href="#">Vendulettes Handbag Haven</a>
-
-    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
-      <span className="navbar-toggler-icon"></span>
+    boxShadow: '0 4px 14px rgba(203, 33, 130, 0.35)',
+  }}
+>
+  <div className="container-fluid px-3 px-lg-4">
+    {/* Brand */}
+    <a
+      className="navbar-brand fw-bold text-white me-3"
+      href="/"
+      style={{
+         fontFamily: '"Monoton", regular',
+          fontSize: '1.8rem',
+  letterSpacing: '0.03em',
+  textShadow: '0 3px 8px rgba(0,0,0,0.35)',
+      }}
+    >
+      Vendulette
+    </a>
+<span className=" fw-light text-white me-3"  
+style={{
+         fontFamily: '"Sacramento", regular',
+          fontSize: '1.2rem',
+  letterSpacing: '0.03em',
+  textShadow: '0 3px 8px rgba(0,0,0,0.35)',
+      }}>for the Vendula London obsessed</span>
+    {/* Toggler */}
+    <button
+      className="navbar-toggler border-0"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded={false}
+      aria-label="Toggle navigation"
+      style={{
+        backgroundColor: 'rgba(255,255,255,0.25)',
+        borderRadius: '999px',
+      }}
+    >
+      <span className="navbar-toggler-icon" />
     </button>
+
+    {/* Nav content */}
     <div className="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
         <li className="nav-item">
-          <a className="nav-link active ps-5" aria-current="page" href="#">Vendula Handbag Library</a>
+          <a
+            className="nav-link active text-white fw-semibold px-3"
+            aria-current="page"
+            href="#"
+            style={{
+              borderRadius: '999px',
+              transition: 'background-color 0.2s ease, transform 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            Vendula Handbag Library
+          </a>
         </li>
-     
+
+             
+
         <li className="nav-item dropdown">
-          <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a
+            className="nav-link dropdown-toggle text-white fw-semibold px-3"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded={false}
+            style={{
+              borderRadius: '999px',
+              transition: 'background-color 0.2s ease, transform 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
             Resources
           </a>
-          <ul className="dropdown-menu">
-            <li><a className="dropdown-item" href="#">Where to Buy - Stockists</a></li>
-            <li><a className="dropdown-item" href="#">Shapes to Compare</a></li>
-            <li className="dropdown-divider"></li>
-            <li><a className="dropdown-item" href="#">Contact</a></li>
+          <ul
+            className="dropdown-menu border-0 shadow"
+            style={{
+              borderRadius: '0px',
+              backgroundColor: '#fff',
+            }}
+          >
+            <li>
+              <a
+                className="dropdown-item py-2"
+                href="#"
+                target="_blank"
+              rel="noopener noreferrer"
+               style={{ fontSize:'0.85rem',color: '#cb2182' }}
+              >
+                Stockists (Coming Soon)
+              </a>
+            </li>
+            <li>
+              <a
+                className="dropdown-item py-2"
+                href="#"
+                style={{ fontSize:'0.85rem',color: '#cb2182' }}
+              >
+                Compare Shapes (Coming Soon)
+              </a>
+            </li>
+                <li>
+              <a
+                className="dropdown-item py-2"
+                href="#"
+               style={{ fontSize:'0.85rem',color: '#cb2182' }}
+              >
+                Vintage Styles (Coming Soon)
+              </a>
+            </li>
+            <li className="dropdown-divider" />
+            <li>
+              <a
+                className="dropdown-item py-2"
+                 href="https://www.vendulalondon.com/"
+                target="_blank"
+              rel="noopener noreferrer"
+                style={{ fontSize:'0.85rem',color: '#cb2182' }}
+              >
+                 Vendula London Official Site
+              </a>
+            </li>
           </ul>
+        </li> 
+          <li className="nav-item">
+          <a
+            className="nav-link text-white fw-semibold px-3"
+            aria-current="page"
+            href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
+          
+            style={{
+              borderRadius: '999px',
+              transition: 'background-color 0.2s ease, transform 0.15s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.25)'
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            Contact
+          </a>
         </li>
-      
       </ul>
-      <form className="d-flex" role="search">
-        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-        <button className="btn btn-outline-success" type="submit">Search</button>
-      </form>
+ {/* <div className="nav nav-tabs" id="nav-tab" role="tablist">
+    <button className="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="/home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">
+            Vendula Handbag Library</button>
+    <button className="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
+    <button className="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
+
+  </div> */}
+      {/* Search */}
+      {/* <form className="d-flex gap-2" role="search">
+        <input
+          className="form-control"
+          type="search"
+          placeholder="Search bags, shapes, seasons…"
+          aria-label="Search"
+          style={{
+            borderRadius: '999px',
+          
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            color: '#cb2182',
+            fontWeight: 500,
+          }}
+        />
+        <button
+          className="btn"
+          type="submit"
+          style={{
+            borderRadius: '999px',
+            backgroundColor: '#fff',
+            color: '#cb2182',
+           
+            fontWeight: 700,
+            transition: 'transform 0.15s ease, background-color 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#ffe6f5'
+            e.currentTarget.style.transform = 'scale(1.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#fff'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+        >
+          Search
+        </button>
+      </form> */}
     </div>
   </div>
-</nav> */}
+</nav>
       {/* <header className="d-flex justify-content-end px-4 py-8 ">
        
    
@@ -132,7 +325,7 @@ export default function App() {
           </Link>
         )}
     
-           <nav>
+           <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top shadow-sm bg-danger-subtle">
   <div className="nav nav-tabs" id="nav-tab" role="tablist">
     <button className="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Home</button>
     <button className="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
