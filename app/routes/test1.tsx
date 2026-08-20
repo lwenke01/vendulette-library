@@ -302,21 +302,33 @@ const seasonsForYear = (year: string) => {
   return (
     <>
     
-      <div className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle"  style={{ zIndex: 1030, top: 96 }}>
-        <div className="container-xl">
-          <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
-          <span className="badge bg-secondary rounded-pill px-3">
+      <div className="navbar navbar-expand-lg navbar-light border-bottom sticky-top shadow-sm"  style={{ zIndex: 1030, top: 66 , backgroundColor: '#fa8ebf'}}>
+        <div className="ms-5" >
+        
+          <span className=" fw-light text-white me-3"  
+style={{
+        //  fontFamily: '"Sacramento", regular',
+          fontSize: '1.1rem',
+  letterSpacing: '0.03em',
+  textShadow: '0 3px 8px rgba(0,0,0,0.35)',
+      }}>Vendula Handbag Library</span>
+          <span className="badge rounded-pill px-3" style={{
+   
+    backgroundColor: '#cb2182',
+
+   
+  }}>
             {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
           </span>
           <div className="ms-auto d-flex align-items-center gap-2">
-            <span className="fw-light fs-6 pe-2 mb-0 d-none d-md-inline">
+            {/* <span className="fw-light fs-6 pe-2 mb-0  d-md-inline">
               Want to help build out the Vendula library? Email me at{' '}
               <a
                 href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
               >
                 hello@vendulette.com
               </a>
-            </span>
+            </span> */}
           </div>
         </div>
       </div>
@@ -334,7 +346,11 @@ const seasonsForYear = (year: string) => {
       <div className="container-xl py-4">
         <div className="row g-4">
           <aside className="col-lg-3">
-            <div className="sticky-top" style={{ top: '1rem' }}>
+            <div className="sticky-top mt-5"  style={{
+    zIndex: 1020,
+    top: 146,
+    
+  }}>
               <div className="card shadow-sm border">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-3">
@@ -449,15 +465,15 @@ const seasonsForYear = (year: string) => {
                 <div className="small mt-1">Try adjusting your filters or search term.</div>
               </div>
             ) : (
-                <div className="d-flex flex-column gap-5">
+                <div className="d-flex flex-column gap-5" >
   {years.map((year) => (
     <section key={year}>
      
   
       {/* Layer 2: sticky */}
-            <div className="sticky-top bg-light border-bottom"
-        style={{ zIndex: 1020, top: 136 }}>
-      <h2 className="h4 fw-bold mb-4">{year}</h2>
+            <div className="sticky-top bg-white px-2 py-5"
+        style={{ zIndex: 1020, top: 106, height:'2rem' }}>
+      <h2 className="h4 fw-bold mb-2">{year}</h2>
 </div>
       <div className="d-flex flex-column gap-5">
         {seasonsForYear(year).map((seasonName) => {
@@ -470,11 +486,10 @@ const seasonsForYear = (year: string) => {
             <div key={`${year}-${seasonName}`}>
                  {/* Layer 3: sticky */}
       <div
-        className="sticky-top bg-light border-bottom"
-        style={{ zIndex: 1010, top: 136 }}
+        className="sticky-top bg-white px-2 pb-2 pt-5"
+        style={{ zIndex: 1010, top: 156 }}
       >
        
-      
               <h3 className="h6 fw-semibold text-muted text-uppercase mb-3">
                 {seasonName}
               </h3>
@@ -494,8 +509,8 @@ const seasonsForYear = (year: string) => {
                     <article key={col.id} className="card shadow-sm border">
                       {collectionPhoto && (
                         <div
-                          className="position-relative rounded-top overflow-hidden"
-                          style={{ height: 280, cursor: 'pointer' }}
+                          className="sticky-top rounded-top overflow-hidden"
+                          style={{ height: 280, cursor: 'pointer', zIndex: 900, top: 200 }}
                           onClick={() =>
                             openLightbox(
                               collectionImages.length ? collectionImages : designImages,

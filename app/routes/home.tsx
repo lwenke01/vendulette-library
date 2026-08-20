@@ -53,6 +53,25 @@ function uniq(arr: string[]): string[] {
   return Array.from(new Set(arr.filter(Boolean)))
 }
 
+function getCollectionYear(collection: any): number {
+  const value = collection.releaseyear ?? collection.release_year
+  const year = Number(value)
+
+  return Number.isFinite(year) ? year : 0
+}
+
+function seasonRank(value: string | null | undefined): number {
+  const seasonName = (value ?? '').toLowerCase()
+
+  if (seasonName.includes('holiday') || seasonName.includes('christmas')) return 5
+  if (seasonName.includes('winter')) return 4
+  if (seasonName.includes('autumn') || seasonName.includes('fall')) return 3
+  if (seasonName.includes('summer')) return 2
+  if (seasonName.includes('spring')) return 1
+
+  return 0
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { collections } = loaderData
 
@@ -114,76 +133,136 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   }, [normalizedCollections])
 
   const filteredCollections = useMemo(() => {
-    const term = search.trim().toLowerCase()
+  const term = search.trim().toLowerCase()
 
-    return normalizedCollections
-      .map((c: any) => {
-        const collectionMatches =
-          !term ||
-          [c.name, c.description, c.season, c.series, c.releaseyear ?? c.release_year]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase()
-            .includes(term)
+  return normalizedCollections
+    .map((c: any) => {
+      const collectionMatches =
+        !term ||
+        [c.name, c.description, c.season, c.series, c.releaseyear ?? c.release_year]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(term)
 
-        const filteredDesigns = c.designs.filter((d: any) => {
-          const designShape = String(d.shape_name?? d.shape ?? '').trim().toLowerCase()
+      const filteredDesigns = c.designs.filter((d: any) => {
+        const designShape = String(d.shape_name ?? d.shape ?? '').trim().toLowerCase()
 
-          if (shape && designShape !== shape.toLowerCase()) return false
-          if (!term) return true
+        if (shape && designShape !== shape.toLowerCase()) return false
+        if (!term) return true
 
-          const haystack = [
-            d.name,
-            d.description,
-            d.shape_name,
-            d.shape,
-            ...(Array.isArray(d.categories) ? d.categories : []),
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase()
+        const haystack = [
+          d.name,
+          d.description,
+          d.shape_name,
+          d.shape,
+          ...(Array.isArray(d.categories) ? d.categories : []),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
 
-          return haystack.includes(term)
-        })
-
-        return {
-          ...c,
-          filteredDesigns,
-          collectionMatches,
-        }
+        return haystack.includes(term)
       })
-      .filter((c: any) => {
-        if (season && c.season !== season) return false
-        if (series && c.series !== series) return false
-        if (shape && c.filteredDesigns.length === 0) return false
-        if (term && !c.collectionMatches && c.filteredDesigns.length === 0) return false
-        return true
-      })
-      .sort(
-        (a: any, b: any) =>
-          Number(b.season ?? b.releaseyear ?? 0) -
-          Number(a.season ?? a.releaseyear ?? 0),
+
+      return {
+        ...c,
+        filteredDesigns,
+        collectionMatches,
+      }
+    })
+    .filter((c: any) => {
+      if (season && c.season !== season) return false
+      if (series && c.series !== series) return false
+
+      // Never show a collection without designs.
+      if (c.filteredDesigns.length === 0) return false
+
+      // A search can match either collection metadata or a design.
+      if (term && !c.collectionMatches && c.filteredDesigns.length === 0) return false
+
+      return true
+    })
+    .sort((a: any, b: any) => {
+      return (
+        getCollectionYear(b) - getCollectionYear(a) ||
+        seasonRank(b.season) - seasonRank(a.season) ||
+        Number(b.sort_order ?? 0) - Number(a.sort_order ?? 0) ||
+        String(a.name ?? '').localeCompare(String(b.name ?? ''))
       )
-  }, [normalizedCollections, search, season, series, shape])
+    })
+}, [normalizedCollections, search, season, series, shape])
 
   const { visibleItems, hasMore, isLoadingMore, loadMoreRef } = useInfiniteCollections(
     filteredCollections,
     50,
   )
 
-  const groupedByYear = useMemo(() => {
-    return visibleItems.reduce((acc: Record<string, any[]>, col: any) => {
-      const year = String(col.releaseyear ?? col.release_year ?? 'Unknown')
-      if (!acc[year]) acc[year] = []
-      acc[year].push(col)
-      return acc
-    }, {})
-  }, [visibleItems])
 
-  const years = useMemo(
-    () => Object.keys(groupedByYear).sort((a, b) => Number(b) - Number(a)),
-    [groupedByYear],
+const collectionYear = (collection: any): number => {
+  const value = collection.releaseyear ?? collection.release_year
+  const year = Number(value)
+
+  return Number.isFinite(year) ? year : 0
+}
+
+const seasonsSort = useMemo(() => {
+  return uniq(
+    normalizedCollections
+      .map((collection: any) => String(collection.season ?? '').trim())
+      .filter(Boolean),
+  ).sort((a, b) => {
+    const aYear = Math.max(
+      ...normalizedCollections
+        .filter((collection: any) => collection.season === a)
+        .map(collectionYear),
+      0,
+    )
+
+    const bYear = Math.max(
+      ...normalizedCollections
+        .filter((collection: any) => collection.season === b)
+        .map(collectionYear),
+      0,
+    )
+
+    // Year descending, then season descending
+    return bYear - aYear || seasonRank(b) - seasonRank(a) || a.localeCompare(b)
+  })
+}, [normalizedCollections])
+
+const groupedByYearAndSeason = useMemo(() => {
+  return visibleItems.reduce(
+    (groups: Record<string, Record<string, any[]>>, collection: any) => {
+      const year = String(getCollectionYear(collection) || 'Unknown')
+      const seasonName = String(collection.season ?? 'Uncategorised')
+
+      if (!groups[year]) groups[year] = {}
+      if (!groups[year][seasonName]) groups[year][seasonName] = []
+
+      groups[year][seasonName].push(collection)
+
+      return groups
+    },
+    {},
   )
+}, [visibleItems])
+
+const years = useMemo(() => {
+  return Object.keys(groupedByYearAndSeason).sort((a, b) => {
+    if (a === 'Unknown') return 1
+    if (b === 'Unknown') return -1
+
+    return Number(b) - Number(a)
+  })
+}, [groupedByYearAndSeason])
+
+const seasonsForYear = (year: string) => {
+  return Object.keys(groupedByYearAndSeason[year] ?? {}).sort((a, b) => {
+    return seasonRank(b) - seasonRank(a) || a.localeCompare(b)
+  })
+}
+
 
   const openLightbox = (images: string[], index = 0) => {
     if (!images.length) return
@@ -222,29 +301,56 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
-        <div className="container-xl">
-          <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
-          <span className="badge bg-secondary rounded-pill px-3">
+    
+      <div className="navbar navbar-expand-lg navbar-light border-bottom sticky-top shadow-sm"  style={{ zIndex: 1030, top: 66 , backgroundColor: '#fa8ebf'}}>
+        <div className="ms-5" >
+        
+          <span className=" fw-light text-white me-3"  
+style={{
+        //  fontFamily: '"Sacramento", regular',
+          fontSize: '1.1rem',
+  letterSpacing: '0.03em',
+  textShadow: '0 3px 8px rgba(0,0,0,0.35)',
+      }}>Vendula Handbag Library</span>
+          <span className="badge rounded-pill px-3" style={{
+   
+    backgroundColor: '#cb2182',
+
+   
+  }}>
             {filteredCollections.length} collection{filteredCollections.length !== 1 ? 's' : ''}
           </span>
           <div className="ms-auto d-flex align-items-center gap-2">
-            <span className="fw-light fs-6 pe-2 mb-0 d-none d-md-inline">
+            {/* <span className="fw-light fs-6 pe-2 mb-0  d-md-inline">
               Want to help build out the Vendula library? Email me at{' '}
               <a
                 href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
               >
                 hello@vendulette.com
               </a>
-            </span>
+            </span> */}
           </div>
         </div>
-      </nav>
+      </div>
+
+   
+
+     
+
+   
+
+      {/* Page content */}
+     
+  
 
       <div className="container-xl py-4">
         <div className="row g-4">
           <aside className="col-lg-3">
-            <div className="sticky-top" style={{ top: '72px' }}>
+            <div className="sticky-top mt-5"  style={{
+    zIndex: 1020,
+    top: 146,
+    
+  }}>
               <div className="card shadow-sm border">
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-center mb-3">
@@ -346,7 +452,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
           </aside>
+{/* main section */}
 
+    
           <main className="col-lg-9">
             {years.length === 0 ? (
               <div className="text-center py-5 px-3 text-muted">
@@ -357,223 +465,459 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                 <div className="small mt-1">Try adjusting your filters or search term.</div>
               </div>
             ) : (
-              <div className="d-flex flex-column gap-5">
-                {years.map((year) => (
-                  <section key={year}>
-                    <h2 className="h6 fw-semibold text-muted text-uppercase border-bottom pb-0 mb-0">
-                      {/* {year} */}
-                    </h2>
+                <div className="d-flex flex-column gap-5" >
+  {years.map((year) => (
+    <section key={year}>
+     
+  
+      {/* Layer 2: sticky */}
+            <div className="sticky-top bg-white px-2 py-5"
+        style={{ zIndex: 1020, top: 106, height:'2rem' }}>
+      <h2 className="h4 fw-bold mb-2">{year}</h2>
+</div>
+      <div className="d-flex flex-column gap-5">
+        {seasonsForYear(year).map((seasonName) => {
+          const collectionsForSeason = groupedByYearAndSeason[year][seasonName]
+            .filter((col: any) => Array.isArray(col.filteredDesigns) && col.filteredDesigns.length > 0)
 
-                    <div className="d-flex flex-column gap-3">
-                      {groupedByYear[year].map((col: any) => {
-                        const designs: any[] = Array.isArray(col.filteredDesigns)
-                          ? col.filteredDesigns
-                          : []
+          if (collectionsForSeason.length === 0) return null
 
-                        const collectionImages = uniq(col.collectionImages ?? [])
-                        const designImages = uniq(
-                          designs.flatMap((d: any) => parseImages(d.imageurls ?? d.image_urls)),
-                        )
-                        const collectionPhoto = collectionImages[0] ?? designImages[0] ?? null
+          return (
+            <div key={`${year}-${seasonName}`}>
+                 {/* Layer 3: sticky */}
+      <div
+        className="sticky-top bg-white px-2 pb-2 pt-5"
+        style={{ zIndex: 1010, top: 156 }}
+      >
+       
+              <h3 className="h6 fw-semibold text-muted text-uppercase mb-3">
+                {seasonName}
+              </h3>
+</div>
+              <div className="d-flex flex-column gap-3">
+                {collectionsForSeason.map((col: any) => {
+                  const designs: any[] = col.filteredDesigns
+                  const collectionImages = uniq(col.collectionImages ?? [])
+                  const designImages = uniq(
+                    designs.flatMap((design: any) =>
+                      parseImages(design.imageurls ?? design.image_urls),
+                    ),
+                  )
+                  const collectionPhoto = collectionImages[0] ?? designImages[0] ?? null
 
-                        return (
-                          <article key={col.id} className="card shadow-sm border">
-                            {/* Collection Banner */}
-                            {collectionPhoto && (
-                              <div 
-                                className="position-relative rounded-top overflow-hidden" 
-                                style={{ height: 280, cursor: 'pointer' }}
-                                onClick={() => openLightbox(collectionImages.length ? collectionImages : designImages, 0)}
-                              >
-                                <img
-                                  src={collectionPhoto}
-                                  alt={col.name}
-                                  loading="lazy"
-                                  className="w-100 h-100"
-                                  style={{ objectFit: 'cover', objectPosition: 'center' }}
-                                />
-                                {/* Gradient overlay */}
-                                <div className="position-absolute bottom-0 start-0 w-100 p-3" 
-                                     style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
-                                  <h3 className="text-white mb-1 fs-4">{col.name}</h3>
-                                  <p className="text-white text-opacity-75 mb-0 small">
-                                    {year} {col.season ? `· ${col.season}` : ''} {col.series ? `· ${col.series}` : ''} {col.type ? `· ${toProperCase(col.type)}` : ''}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div className="card-body pt-3">
-                              {designs.length > 0 && (
-                                <div className="accordion" id={`accordion-${col.id}`}>
-                                  {designs.map((d: any, idx: number) => {
-                                    const images = uniq(parseImages(d.imageurls ?? d.image_urls))
-                                    const thumb = images[0] ?? null
-                                    const isOpen = openDesigns[d.id]
+                  return (
+                    <article key={col.id} className="card shadow-sm border">
+                      {collectionPhoto && (
+                        <div
+                          className="sticky-top rounded-top overflow-hidden"
+                          style={{ height: 280, cursor: 'pointer', zIndex: 900, top: 200 }}
+                          onClick={() =>
+                            openLightbox(
+                              collectionImages.length ? collectionImages : designImages,
+                              0,
+                            )
+                          }
+                        >
+                          <img
+                            src={collectionPhoto}
+                            alt={col.name}
+                            loading="lazy"
+                            className="w-100 h-100"
+                            style={{ objectFit: 'cover', objectPosition: 'center' }}
+                          />
 
-                                    return (
-                                      <div key={d.id} className="accordion-item border mb-2 rounded">
-                                        <h2 className="accordion-header">
-                                          <button
-                                            className="accordion-button d-flex align-items-center gap-3 py-3"
-                                            type="button"
-                                            onClick={() => toggleDesign(d.id)}
-                                            aria-expanded={isOpen}
-                                            aria-controls={`design-collapse-${d.id}`}
-                                          >
-                                            {/* Thumbnail */}
-                                            <div
-                                              className="flex-shrink-0 rounded overflow-hidden bg-light border"
-                                              style={{ width: 64, height: 64 }}
-                                            >
-                                              {thumb ? (
-                                                <img
-                                                  src={thumb}
-                                                  alt={d.name}
-                                                  loading="lazy"
-                                                  width={64}
-                                                  height={64}
-                                                  className="w-100 h-100"
-                                                  style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                                  onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    openLightbox(images, 0)
-                                                  }}
-                                                />
-                                              ) : (
-                                                <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
-                                                  <small>No img</small>
-                                                </div>
-                                              )}
+                          <div
+                            className="position-absolute bottom-0 start-0 w-100 p-3"
+                            style={{
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+                            }}
+                          >
+                            <h3 className="text-white mb-1 fs-4">{col.name}</h3>
+                            <p className="text-white text-opacity-75 mb-0 small">
+                              {year}
+                              {col.series ? ` · ${col.series}` : ''}
+                              {col.type ? ` · ${toProperCase(col.type)}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="card-body pt-3">
+                        <div className="accordion" id={`accordion-${col.id}`}>
+                          {designs.map((d: any) => {
+                            const images = uniq(parseImages(d.imageurls ?? d.image_urls))
+                            const thumb = images[0] ?? null
+                            const isOpen = Boolean(openDesigns[d.id])
+
+                            return (
+                              <div key={d.id} className="accordion-item border mb-2 rounded">
+                                <h4 className="accordion-header">
+                                  <button
+                                    className={`accordion-button d-flex align-items-center gap-3 py-3 ${
+                                      isOpen ? '' : 'collapsed'
+                                    }`}
+                                    type="button"
+                                    onClick={() => toggleDesign(d.id)}
+                                    aria-expanded={isOpen}
+                                    aria-controls={`design-collapse-${d.id}`}
+                                  >
+                                    <div
+                                      className="flex-shrink-0 rounded overflow-hidden bg-light border"
+                                      style={{ width: 64, height: 64 }}
+                                    >
+                                      {thumb ? (
+                                        <img
+                                          src={thumb}
+                                          alt={d.name}
+                                          loading="lazy"
+                                          width={64}
+                                          height={64}
+                                          className="w-100 h-100"
+                                          style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                          onClick={(event) => {
+                                            event.stopPropagation()
+                                            openLightbox(images, 0)
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                          <small>No img</small>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    <div className="flex-grow-1 text-start">
+                                      <div className="fw-medium" style={{ fontSize: '0.95rem' }}>
+                                        {d.name}
+                                      </div>
+                                      <p
+                                        className="mb-0 small text-muted fw-medium"
+                                        style={{ fontSize: '0.8rem' }}
+                                      >
+                                        {d.shape_name || ''}
+                                        {d.size ? ` · ${d.size}` : ''}
+                                        {d.measurements ? ` · ${d.measurements}` : ''}
+                                      </p>
+                                    </div>
+                                  </button>
+                                </h4>
+
+                                {isOpen && (
+                                  <div
+                                    id={`design-collapse-${d.id}`}
+                                    className="accordion-collapse collapse show"
+                                  >
+                                    <div className="accordion-body bg-light">
+                                      <div className="row g-3">
+                                        {images.length > 0 && (
+                                          <div className="col-md-4">
+                                            <div className="rounded overflow-hidden border bg-white">
+                                              <img
+                                                src={images[0]}
+                                                alt={d.name}
+                                                loading="lazy"
+                                                className="w-100"
+                                                style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                onClick={() => openLightbox(images, 0)}
+                                              />
                                             </div>
 
-                                            {/* Design info */}
-                                            <div className="flex-grow-1 text-start">
-                                              <div className="fw-medium" style={{ fontSize: '0.95rem' }}>
-                                                {d.name}
-                                              </div>
-                                              <p className="mb-0 small text-muted fw-medium" style={{ fontSize: '0.8rem' }}>
-                                                {d.shape_name || ''}{' '}
-                                                {d.size ? `· ${d.size}` : ''}
-                                                {d.measurements ? `· ${d.measurements}` : ''}
-                                              </p>
-                                            </div>
-
-                                            {/* Badge */}
-                                            <div className="flex-shrink-0">
-                                              <span className="badge bg-secondary">
-                                                {col.season || ''} {year ? `| ${year}` : ''}
-                                              </span>
-                                            </div>
-                                          </button>
-                                        </h2>
-                                        
-                                        {isOpen && (
-                                          <div
-                                            id={`design-collapse-${d.id}`}
-                                            className="accordion-collapse collapse show"
-                                          >
-                                            <div className="accordion-body bg-light">
-                                              <div className="row g-3">
-                                                {/* Images */}
-                                                {images.length > 0 && (
-                                                  <div className="col-md-4">
-                                                    <div className="rounded overflow-hidden border bg-white">
-                                                      <img
-                                                        src={images[0]}
-                                                        alt={d.name}
-                                                        loading="lazy"
-                                                        className="w-100"
-                                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                                        onClick={() => openLightbox(images, 0)}
-                                                      />
-                                                    </div>
-                                                    {images.length > 1 && (
-                                                      <div className="row g-1 mt-2">
-                                                        {images.slice(1, 5).map((src, i) => (
-                                                          <div key={i} className="col-3">
-                                                            <img
-                                                              src={src}
-                                                              alt={`${d.name} ${i + 2}`}
-                                                              loading="lazy"
-                                                              className="rounded border w-100"
-                                                              style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                                              onClick={() => openLightbox(images, i + 1)}
-                                                            />
-                                                          </div>
-                                                        ))}
-                                                      </div>
-                                                    )}
+                                            {images.length > 1 && (
+                                              <div className="row g-1 mt-2">
+                                                {images.slice(1, 5).map((src: string, index: number) => (
+                                                  <div key={src} className="col-3">
+                                                    <img
+                                                      src={src}
+                                                      alt={`${d.name} ${index + 2}`}
+                                                      loading="lazy"
+                                                      className="rounded border w-100"
+                                                      style={{ objectFit: 'cover', cursor: 'pointer' }}
+                                                      onClick={() => openLightbox(images, index + 1)}
+                                                    />
                                                   </div>
-                                                )}
-
-                                                {/* Details */}
-                                                <div className="col-md-8">
-                                                  <h6 className="fw-semibold mb-2">Details</h6>
-                                                  
-                                                  {d.shape_name && (
-                                                    <div className="mb-2">
-                                                      <span className="text-muted small">Shape:</span>{' '}
-                                                      <span className="fw-medium">{d.shape_name}</span>
-                                                    </div>
-                                                  )}
-                                                  
-                                                  {d.size && (
-                                                    <div className="mb-2">
-                                                      <span className="text-muted small">Size:</span>{' '}
-                                                      <span className="fw-medium">{d.size}</span>
-                                                    </div>
-                                                  )}
-                                                  
-                                                  {d.measurements && (
-                                                    <div className="mb-2">
-                                                      <span className="text-muted small">Dimensions:</span>{' '}
-                                                      <span className="fw-medium">{d.measurements}</span>
-                                                    </div>
-                                                  )}
-                                                  
-                                                  {d.description && (
-                                                    <div className="mb-2">
-                                                      <span className="text-muted small">Description:</span>{' '}
-                                                      <p className="mb-0 small">{d.description}</p>
-                                                    </div>
-                                                  )}
-
-                                                  {d.categories && Array.isArray(d.categories) && d.categories.length > 0 && (
-                                                    <div className="mb-2">
-                                                      <span className="text-muted small">Categories:</span>{' '}
-                                                      {d.categories.map((cat: string, i: number) => (
-                                                        <span key={i} className="badge bg-secondary me-1">{cat}</span>
-                                                      ))}
-                                                    </div>
-                                                  )}
-
-                                                  <div className="mt-3">
-                                                    <Link
-                                                      to={`/collection/${col.id}`}
-                                                      className="btn btn-sm btn-outline-secondary"
-                                                    >
-                                                      View Collection
-                                                    </Link>
-                                                  </div>
-                                                </div>
+                                                ))}
                                               </div>
-                                            </div>
+                                            )}
                                           </div>
                                         )}
+
+                                        <div className={images.length > 0 ? 'col-md-8' : 'col-12'}>
+                                          <h5 className="h6 fw-semibold mb-2">Details</h5>
+
+                                          {d.shape_name && (
+                                            <div className="mb-2">
+                                              <span className="text-muted small">Shape:</span>{' '}
+                                              <span className="fw-medium">{d.shape_name}</span>
+                                            </div>
+                                          )}
+
+                                          {d.size && (
+                                            <div className="mb-2">
+                                              <span className="text-muted small">Size:</span>{' '}
+                                              <span className="fw-medium">{d.size}</span>
+                                            </div>
+                                          )}
+
+                                          {d.measurements && (
+                                            <div className="mb-2">
+                                              <span className="text-muted small">Dimensions:</span>{' '}
+                                              <span className="fw-medium">{d.measurements}</span>
+                                            </div>
+                                          )}
+
+                                          {d.description && (
+                                            <div className="mb-2">
+                                              <span className="text-muted small">Description:</span>
+                                              <p className="mb-0 small">{d.description}</p>
+                                            </div>
+                                          )}
+
+                                          <div className="mt-3">
+                                            <Link
+                                              to={`/collection/${col.id}`}
+                                              className="btn btn-sm btn-outline-secondary"
+                                            >
+                                              View Collection
+                                            </Link>
+                                          </div>
+                                        </div>
                                       </div>
-                                    )
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          </article>
-                        )
-                      })}
-                    </div>
-                  </section>
-                ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
               </div>
+            </div>
+          )
+        })}
+      </div>
+    </section>
+  ))}
+</div>
+            //   <div className="d-flex flex-column gap-5">
+            //     {years.map((year) => (
+            //       <section key={year}>
+            //         <h2 className="h6 fw-semibold text-muted text-uppercase border-bottom pb-0 mb-0">
+            //           {/* {year} */}
+            //         </h2>
+
+            //         <div className="d-flex flex-column gap-3">
+            //           {groupedByYear[year].map((col: any) => {
+            //             const designs: any[] = Array.isArray(col.filteredDesigns)
+            //               ? col.filteredDesigns
+            //               : []
+
+            //             const collectionImages = uniq(col.collectionImages ?? [])
+            //             const designImages = uniq(
+            //               designs.flatMap((d: any) => parseImages(d.imageurls ?? d.image_urls)),
+            //             )
+            //             const collectionPhoto = collectionImages[0] ?? designImages[0] ?? null
+
+            //             return (
+            //               <article key={col.id} className="card shadow-sm border">
+            //                 {/* Collection Banner */}
+            //                 {collectionPhoto && (
+            //                   <div 
+            //                     className="position-relative rounded-top overflow-hidden" 
+            //                     style={{ height: 280, cursor: 'pointer' }}
+            //                     onClick={() => openLightbox(collectionImages.length ? collectionImages : designImages, 0)}
+            //                   >
+            //                     <img
+            //                       src={collectionPhoto}
+            //                       alt={col.name}
+            //                       loading="lazy"
+            //                       className="w-100 h-100"
+            //                       style={{ objectFit: 'cover', objectPosition: 'center' }}
+            //                     />
+            //                     {/* Gradient overlay */}
+            //                     <div className="position-absolute bottom-0 start-0 w-100 p-3" 
+            //                          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)' }}>
+            //                       <h3 className="text-white mb-1 fs-4">{col.name}</h3>
+            //                       <p className="text-white text-opacity-75 mb-0 small">
+            //                         {year} {col.season ? `· ${col.season}` : ''} {col.series ? `· ${col.series}` : ''} {col.type ? `· ${toProperCase(col.type)}` : ''}
+            //                       </p>
+            //                     </div>
+            //                   </div>
+            //                 )}
+                            
+            //                 <div className="card-body pt-3">
+            //                   {designs.length > 0 && (
+            //                     <div className="accordion" id={`accordion-${col.id}`}>
+            //                       {designs.map((d: any, idx: number) => {
+            //                         const images = uniq(parseImages(d.imageurls ?? d.image_urls))
+            //                         const thumb = images[0] ?? null
+            //                         const isOpen = openDesigns[d.id]
+
+            //                         return (
+            //                           <div key={d.id} className="accordion-item border mb-2 rounded">
+            //                             <h2 className="accordion-header">
+            //                               <button
+            //                                 className="accordion-button d-flex align-items-center gap-3 py-3"
+            //                                 type="button"
+            //                                 onClick={() => toggleDesign(d.id)}
+            //                                 aria-expanded={isOpen}
+            //                                 aria-controls={`design-collapse-${d.id}`}
+            //                               >
+            //                                 {/* Thumbnail */}
+            //                                 <div
+            //                                   className="flex-shrink-0 rounded overflow-hidden bg-light border"
+            //                                   style={{ width: 64, height: 64 }}
+            //                                 >
+            //                                   {thumb ? (
+            //                                     <img
+            //                                       src={thumb}
+            //                                       alt={d.name}
+            //                                       loading="lazy"
+            //                                       width={64}
+            //                                       height={64}
+            //                                       className="w-100 h-100"
+            //                                       style={{ objectFit: 'cover', cursor: 'pointer' }}
+            //                                       onClick={(e) => {
+            //                                         e.stopPropagation()
+            //                                         openLightbox(images, 0)
+            //                                       }}
+            //                                     />
+            //                                   ) : (
+            //                                     <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+            //                                       <small>No img</small>
+            //                                     </div>
+            //                                   )}
+            //                                 </div>
+
+            //                                 {/* Design info */}
+            //                                 <div className="flex-grow-1 text-start">
+            //                                   <div className="fw-medium" style={{ fontSize: '0.95rem' }}>
+            //                                     {d.name}
+            //                                   </div>
+            //                                   <p className="mb-0 small text-muted fw-medium" style={{ fontSize: '0.8rem' }}>
+            //                                     {d.shape_name || ''}{' '}
+            //                                     {d.size ? `· ${d.size}` : ''}
+            //                                     {d.measurements ? `· ${d.measurements}` : ''}
+            //                                   </p>
+            //                                 </div>
+
+            //                                 {/* Badge */}
+            //                                 <div className="flex-shrink-0">
+            //                                   <span className="badge bg-secondary">
+            //                                     {col.season || ''} {year ? `| ${year}` : ''}
+            //                                   </span>
+            //                                 </div>
+            //                               </button>
+            //                             </h2>
+                                        
+            //                             {isOpen && (
+            //                               <div
+            //                                 id={`design-collapse-${d.id}`}
+            //                                 className="accordion-collapse collapse show"
+            //                               >
+            //                                 <div className="accordion-body bg-light">
+            //                                   <div className="row g-3">
+            //                                     {/* Images */}
+            //                                     {images.length > 0 && (
+            //                                       <div className="col-md-4">
+            //                                         <div className="rounded overflow-hidden border bg-white">
+            //                                           <img
+            //                                             src={images[0]}
+            //                                             alt={d.name}
+            //                                             loading="lazy"
+            //                                             className="w-100"
+            //                                             style={{ objectFit: 'cover', cursor: 'pointer' }}
+            //                                             onClick={() => openLightbox(images, 0)}
+            //                                           />
+            //                                         </div>
+            //                                         {images.length > 1 && (
+            //                                           <div className="row g-1 mt-2">
+            //                                             {images.slice(1, 5).map((src, i) => (
+            //                                               <div key={i} className="col-3">
+            //                                                 <img
+            //                                                   src={src}
+            //                                                   alt={`${d.name} ${i + 2}`}
+            //                                                   loading="lazy"
+            //                                                   className="rounded border w-100"
+            //                                                   style={{ objectFit: 'cover', cursor: 'pointer' }}
+            //                                                   onClick={() => openLightbox(images, i + 1)}
+            //                                                 />
+            //                                               </div>
+            //                                             ))}
+            //                                           </div>
+            //                                         )}
+            //                                       </div>
+            //                                     )}
+
+            //                                     {/* Details */}
+            //                                     <div className="col-md-8">
+            //                                       <h6 className="fw-semibold mb-2">Details</h6>
+                                                  
+            //                                       {d.shape_name && (
+            //                                         <div className="mb-2">
+            //                                           <span className="text-muted small">Shape:</span>{' '}
+            //                                           <span className="fw-medium">{d.shape_name}</span>
+            //                                         </div>
+            //                                       )}
+                                                  
+            //                                       {d.size && (
+            //                                         <div className="mb-2">
+            //                                           <span className="text-muted small">Size:</span>{' '}
+            //                                           <span className="fw-medium">{d.size}</span>
+            //                                         </div>
+            //                                       )}
+                                                  
+            //                                       {d.measurements && (
+            //                                         <div className="mb-2">
+            //                                           <span className="text-muted small">Dimensions:</span>{' '}
+            //                                           <span className="fw-medium">{d.measurements}</span>
+            //                                         </div>
+            //                                       )}
+                                                  
+            //                                       {d.description && (
+            //                                         <div className="mb-2">
+            //                                           <span className="text-muted small">Description:</span>{' '}
+            //                                           <p className="mb-0 small">{d.description}</p>
+            //                                         </div>
+            //                                       )}
+
+            //                                       {d.categories && Array.isArray(d.categories) && d.categories.length > 0 && (
+            //                                         <div className="mb-2">
+            //                                           <span className="text-muted small">Categories:</span>{' '}
+            //                                           {d.categories.map((cat: string, i: number) => (
+            //                                             <span key={i} className="badge bg-secondary me-1">{cat}</span>
+            //                                           ))}
+            //                                         </div>
+            //                                       )}
+
+            //                                       <div className="mt-3">
+            //                                         <Link
+            //                                           to={`/collection/${col.id}`}
+            //                                           className="btn btn-sm btn-outline-secondary"
+            //                                         >
+            //                                           View Collection
+            //                                         </Link>
+            //                                       </div>
+            //                                     </div>
+            //                                   </div>
+            //                                 </div>
+            //                               </div>
+            //                             )}
+            //                           </div>
+            //                         )
+            //                       })}
+            //                     </div>
+            //                   )}
+            //                 </div>
+            //               </article>
+            //             )
+            //           })}
+            //         </div>
+            //       </section>
+            //     ))}
+            //   </div>
             )}
 
             <div ref={loadMoreRef} className="py-4 text-center">

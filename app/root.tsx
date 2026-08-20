@@ -86,7 +86,7 @@ export default function App() {
     <>
     
 <nav
-  className="navbar navbar-expand-lg fixed-top border-bottom"
+  className="navbar navbar-expand-lg fixed-top"
   style={{
     zIndex: 1040,
     top: 0,
@@ -135,7 +135,7 @@ style={{
 
     {/* Nav content */}
     <div className="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
         <li className="nav-item">
           <a
             className="nav-link active text-white fw-semibold px-3"
@@ -193,28 +193,41 @@ style={{
               <a
                 className="dropdown-item py-2"
                 href="#"
-                style={{ color: '#cb2182' }}
+                target="_blank"
+              rel="noopener noreferrer"
+               style={{ fontSize:'0.85rem',color: '#cb2182' }}
               >
-                Where to Buy – Stockists
+                Stockists (Coming Soon)
               </a>
             </li>
             <li>
               <a
                 className="dropdown-item py-2"
                 href="#"
-                style={{ color: '#cb2182' }}
+                style={{ fontSize:'0.85rem',color: '#cb2182' }}
               >
-                Shapes to Compare
+                Compare Shapes (Coming Soon)
+              </a>
+            </li>
+                <li>
+              <a
+                className="dropdown-item py-2"
+                href="#"
+               style={{ fontSize:'0.85rem',color: '#cb2182' }}
+              >
+                Vintage Styles (Coming Soon)
               </a>
             </li>
             <li className="dropdown-divider" />
             <li>
               <a
                 className="dropdown-item py-2"
-                href="#"
-                style={{ color: '#cb2182' }}
+                 href="https://www.vendulalondon.com/"
+                target="_blank"
+              rel="noopener noreferrer"
+                style={{ fontSize:'0.85rem',color: '#cb2182' }}
               >
-                Contact
+                 Vendula London Official Site
               </a>
             </li>
           </ul>
@@ -223,7 +236,8 @@ style={{
           <a
             className="nav-link text-white fw-semibold px-3"
             aria-current="page"
-            href="#"
+            href="mailto:hello@vendulette.com?subject=Vendulette%20Library%20enquiry&body=Hello%2C%0A%0AI%20would%20like%20to%20ask%20about..."
+          
             style={{
               borderRadius: '999px',
               transition: 'background-color 0.2s ease, transform 0.15s ease',

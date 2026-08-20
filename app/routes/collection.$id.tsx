@@ -444,7 +444,7 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
     return (
       <div className="container py-5">
         <div className="alert alert-warning mb-4">Collection not found.</div>
-        <Link to="/" className="btn btn-outline-secondary">
+        <Link to="/" className="btn btn-outline-white text-white me-3" >
           Back to library
         </Link>
       </div>
@@ -456,13 +456,23 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
+       <div className="navbar navbar-expand-lg navbar-light border-bottom sticky-top shadow-sm mb-5"  style={{ zIndex: 1030, top: 66 , backgroundColor: '#fa8ebf'}}>
         <div className="container-xl">
-          <Link to="/" className="navbar-brand fw-bold text-decoration-none">
-            Vendula Handbag Library
+          <Link to="/" className="navbar-brand fw-bold text-white text-decoration-none" >
+            Vendula Handbag Library: Collection: {normalizedCollection.name}
           </Link>
-          <div className="ms-auto d-flex gap-2">
-            <Link to="/" className="btn btn-sm btn-outline-secondary">
+          <div className="ms-auto d-flex gap-2" style={{
+   
+    backgroundColor: '#cb2182',
+
+   
+  }}>
+            <Link to="/" className="btn btn-sm btn-outline-white text-white" style={{
+   
+    backgroundColor: '#cb2182',
+
+   
+  }}>
               Back to library
             </Link>
             {/* <button type="button" className="btn btn-sm btn-dark d-none" onClick={() => setShowAdmin(true)}>
@@ -470,7 +480,9 @@ export default function CollectionDetail({ loaderData }: Route.ComponentProps) {
             </button> */}
           </div>
         </div>
-      </nav>
+      </div>
+
+   
 
       <div className="container-xl py-4">
         <div className="row g-4">
