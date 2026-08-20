@@ -1,7 +1,7 @@
 import { eq, desc, asc } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from '../../database/schema'
-import type { Collection, Design, Shape, Season, DesignImage, CollectionImage, ShapeImage } from '../../database/schema'
+import type { Collection, Design, Shape, Season, DesignImage, CollectionImage, ShapeImage } from '../../database/schema/vendula'
 
 const collections = schema.collections
 const designs = schema.designs
