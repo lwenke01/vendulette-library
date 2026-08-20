@@ -12,7 +12,7 @@ export default [
     route('/viewAll', 'routes/all-designs-sort.tsx'),
       route('/shapes', 'routes/shapes.tsx'),
       route('/collections', 'routes/all-collections-sort.tsx'),
-
+ route('/test1', 'routes/test1.tsx'),
   //route('/stockists', 'routes/buy.tsx'),
  // route('/stockists/form', 'routes/buy.add.tsx'),
   // Auth required routes (verified on Hono server)

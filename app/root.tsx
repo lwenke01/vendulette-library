@@ -75,7 +75,7 @@ export default function App() {
         </a>
     </div>
 </nav>  */}
-<nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
+{/* <nav className="navbar navbar-expand-lg fixed-top bg-danger-subtle border-bottom border-body"> 
   
 
   <div className="container-fluid">
@@ -109,7 +109,7 @@ export default function App() {
       </form>
     </div>
   </div>
-</nav>
+</nav> */}
       {/* <header className="d-flex justify-content-end px-4 py-8 ">
        
    
