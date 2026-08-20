@@ -20,4 +20,8 @@
 .tool-versions
 .claude/
 /test-local/
+
+# Helpers
 /util/
+/sqlHelpers/
+PROJECT_COMMANDS.md
