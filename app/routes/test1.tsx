@@ -301,7 +301,8 @@ const seasonsForYear = (year: string) => {
 
   return (
     <>
-      {/* <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
+    
+      <div className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle"  style={{ zIndex: 1030, top: 96 }}>
         <div className="container-xl">
           <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
           <span className="badge bg-secondary rounded-pill px-3">
@@ -318,7 +319,17 @@ const seasonsForYear = (year: string) => {
             </span>
           </div>
         </div>
-      </nav> */}
+      </div>
+
+   
+
+     
+
+   
+
+      {/* Page content */}
+     
+  
 
       <div className="container-xl py-4">
         <div className="row g-4">
@@ -425,7 +436,9 @@ const seasonsForYear = (year: string) => {
               </div>
             </div>
           </aside>
+{/* main section */}
 
+    
           <main className="col-lg-9">
             {years.length === 0 ? (
               <div className="text-center py-5 px-3 text-muted">
@@ -439,7 +452,11 @@ const seasonsForYear = (year: string) => {
                 <div className="d-flex flex-column gap-5">
   {years.map((year) => (
     <section key={year}>
-         <div className="sticky-top bg-white "  style={{ height: '2rem' }}>
+     
+  
+      {/* Layer 2: sticky */}
+            <div className="sticky-top bg-light border-bottom"
+        style={{ zIndex: 1020, top: 136 }}>
       <h2 className="h4 fw-bold mb-4">{year}</h2>
 </div>
       <div className="d-flex flex-column gap-5">
@@ -451,7 +468,13 @@ const seasonsForYear = (year: string) => {
 
           return (
             <div key={`${year}-${seasonName}`}>
-                <div className="sticky-top bg-white pt-2" style={{ margin: '2rem' }}>
+                 {/* Layer 3: sticky */}
+      <div
+        className="sticky-top bg-light border-bottom"
+        style={{ zIndex: 1010, top: 136 }}
+      >
+       
+      
               <h3 className="h6 fw-semibold text-muted text-uppercase mb-3">
                 {seasonName}
               </h3>
