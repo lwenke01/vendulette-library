@@ -198,17 +198,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     50,
   )
 
-  const seasonRank = (value: string | null | undefined) => {
-  const season = (value ?? '').toLowerCase()
-
-  if (season.includes('holiday') || season.includes('christmas')) return 5
-  if (season.includes('winter')) return 4
-  if (season.includes('autumn') || season.includes('fall')) return 3
-  if (season.includes('summer')) return 2
-  if (season.includes('spring')) return 1
-
-  return 0
-}
 
 const collectionYear = (collection: any): number => {
   const value = collection.releaseyear ?? collection.release_year
@@ -312,7 +301,7 @@ const seasonsForYear = (year: string) => {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
+      {/* <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm bg-danger-subtle">
         <div className="container-xl">
           <span className="navbar-brand fw-bold mb-0">Vendula Handbag Library</span>
           <span className="badge bg-secondary rounded-pill px-3">
@@ -329,7 +318,7 @@ const seasonsForYear = (year: string) => {
             </span>
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       <div className="container-xl py-4">
         <div className="row g-4">
@@ -450,8 +439,9 @@ const seasonsForYear = (year: string) => {
                 <div className="d-flex flex-column gap-5">
   {years.map((year) => (
     <section key={year}>
+         <div className="sticky-top bg-white "  style={{ height: '2rem' }}>
       <h2 className="h4 fw-bold mb-4">{year}</h2>
-
+</div>
       <div className="d-flex flex-column gap-5">
         {seasonsForYear(year).map((seasonName) => {
           const collectionsForSeason = groupedByYearAndSeason[year][seasonName]
@@ -461,10 +451,11 @@ const seasonsForYear = (year: string) => {
 
           return (
             <div key={`${year}-${seasonName}`}>
+                <div className="sticky-top bg-white pt-2" style={{ margin: '2rem' }}>
               <h3 className="h6 fw-semibold text-muted text-uppercase mb-3">
                 {seasonName}
               </h3>
-
+</div>
               <div className="d-flex flex-column gap-3">
                 {collectionsForSeason.map((col: any) => {
                   const designs: any[] = col.filteredDesigns
