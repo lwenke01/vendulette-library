@@ -1,6 +1,14 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import {
+  seasonsGet,
+  seasonByIdGet,
+  seasonByYearGet,
+  seasonCurrentGet,
+  seasonPost,
+  seasonPut,
+  seasonDelete,
+  seasonReorderPost,
   vendulaCollectionsGet,
   vendulaCollectionById,
   vendulaCollectionsPost,
@@ -35,6 +43,16 @@ export const setHandlers = (app: Hono<HonoENV>) => {
       allowHeaders: ['Content-Type', 'Authorization'],
     })
   )
+
+  // Seasons
+  apiHandler.get('/seasons', ...seasonsGet)
+  apiHandler.get('/seasons/:id', ...seasonByIdGet)
+  apiHandler.get('/seasons/year/:year', ...seasonByYearGet)
+  apiHandler.get('/seasons/current', ...seasonCurrentGet)
+  apiHandler.post('/seasons', ...seasonPost)
+  apiHandler.put('/admin/seasons/:id', ...seasonPut)
+  apiHandler.delete('/admin/seasons/:id', ...seasonDelete)
+  apiHandler.post('/admin/seasons/reorder', ...seasonReorderPost)
 
   // Collections
   apiHandler.get('/collections', ...vendulaCollectionsGet)
