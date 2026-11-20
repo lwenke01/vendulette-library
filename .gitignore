@@ -25,3 +25,5 @@
 /util/
 /sqlHelpers/
 PROJECT_COMMANDS.md
+/x_test/
+/z_dbUpdates/
